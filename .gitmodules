@@ -1,0 +1,12 @@
+[submodule "js/thirdparty/blueimp-load-image"]
+	path = js/thirdparty/blueimp-load-image
+	url = https://github.com/blueimp/JavaScript-Load-Image
+[submodule "css/thirdparty/Font-Awesome"]
+	path = css/thirdparty/Font-Awesome
+	url = https://github.com/FortAwesome/Font-Awesome.git
+[submodule "js/thirdparty/history.js"]
+	path = js/thirdparty/history.js
+	url = https://github.com/browserstate/history.js
+[submodule "js/thirdparty/malihu-custom-scrollbar"]
+	path = js/thirdparty/malihu-custom-scrollbar
+	url = git@github.com:malihu/malihu-custom-scrollbar-plugin.git
