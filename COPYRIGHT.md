@@ -48,3 +48,20 @@ This program includes works distributed under the terms of another license(s) an
     <(http://jquery.com)><br />
     Copyright (c) 2005, 2014 jQuery Foundation, Inc. and other contributors<br />
     jQuery is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+*   __jQuery Ajax Native Plugin__<br />
+    <(https://github.com/acigna/jquery-ajax-native)><br />
+    Copyright (c) 2015 Tarik Zakaria Benmerar, [Acigna Inc](http://www.acigna.com)<br />
+    jQuery Ajax Native Plugin is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+*   __Malihu custom scrollbar plugin__<br />
+    <(http://manos.malihu.gr)><br />
+    Copyright (c) 2014 Manos Malihutsakis, http://manos.malihu.gr<br />
+    Malihu custom scrollbar plugin is licensed under the [MIT license](http://opensource.org/licenses/MIT).
+
+*   __Leaflet 0.7.5__<br />
+    <(http://leafletjs.com)><br />
+    Copyright (c) 2010-2014, Vladimir Agafonkin<br />
+    Copyright (c) 2010-2011, CloudMade<br />
+    Leaflet is licensed under the [BSD 2-Clause license](http://opensource.org/licenses/BSD-2-Clause).
+
