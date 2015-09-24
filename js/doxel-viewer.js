@@ -33,12 +33,44 @@
  *      Attribution" section of <http://doxel.org/license>.
  */
 
-
 var History=window.History;
+
+// override loadImage.getExifThumbnail
+loadImage.getExifThumbnail=function(dataview, offset, length) {
+  var blob=new Blob([dataview.buffer.slice(offset,offset+length)],{type:'image/jpeg'});
+  var URL=window.URL||window.webkitURL;
+  return URL.createObjectURL(blob);
+}
+
+function getParam(name) {
+  var list=window.location.search.substring(1).replace(/=/,'&').split('&');
+  var index=list.indexOf(name);
+  return (index<0)?undefined:decodeURIComponent(list[index+1]); 
+}
 
 $(document).ready(function(){
 
+    var src=getParam('src');
     viewer.segmentURL='upload/2015/09/02/14412040/2f4acd908588c2590ee06cb67187c85b/1441204044_000000';
+    viewer.segmentURL='upload/2015/08/23/14403273/2f4acd908588c2590ee06cb67187c85b/1440327326_000000';
+    src=src||document.referrer||viewer.segmentURL;
+    src=src.replace(/\/[^\/]+.html$/,'');
+
+    // remove hostname from src on same origin
+    if (src.substring(0,window.location.origin.length+1)==window.location.origin+'/') {
+      src=src.substring(window.location.origin.length);
+    }
+
+    if (document.location.pathname.replace(/[^\/]+.html$/,'')!=src) {
+      viewer.segmentURL=src;
+    }
+
+    // change url
+    if (window.location.search!='?src='+viewer.segmentURL) {
+      History.pushState({
+        src: src
+      },null,'?src='+viewer.segmentURL);
+    }
 
     $('iframe').attr('src',viewer.segmentURL+'/potree');
 
@@ -63,6 +95,13 @@ $(document).ready(function(){
 * @object viewer
 */
 var viewer={
+
+    /**
+    * @property viewer.metadata_size
+    *
+    * default range to search for jpeg metadata
+    */
+    metadata_size: 48*1024,
 
     /**
     * @method viewer.init
@@ -113,7 +152,8 @@ var viewer={
 
           thumbs.push({
             view: view,
-            url: viewer.segmentURL+'/'+view.value.ptr_wrapper.data.filename
+            url: viewer.segmentURL+'/'+view.value.ptr_wrapper.data.filename,
+            metadata_size: view.value.ptr_wrapper.data.metadata_size
           });
 
         });
@@ -152,21 +192,37 @@ var viewer={
       $.ajax({
         dataType: 'native',
         url: viewer.thumbs[viewer.thumbs.current].url,
+        headers: { 'Range' : 'bytes=0-'+viewer.thumbs[viewer.thumbs.current].metadata_size||viewer.metadata_size },
         xhrFields: {
           responseType: 'blob'
         },
         success: function(blob) {
 
           var thumb=viewer.thumbs[viewer.thumbs.current];
+          var thumbIndex=viewer.thumbs.current;
 
           // extract exif data (thumbnail could be here)
           loadImage.parseMetaData(blob, function(data) {
+
+              if (data.exif && data.exif.Thumbnail) {
+                $('#thumbnails [data-key='+thumb.view.key+'] i').css({
+                  backgroundImage: 'url('+data.exif.Thumbnail+')'
+                });
+
+                // load next thumbnail
+                setTimeout(viewer.loadThumbnails);
+
+              } else {
+                resizeImage();
+              }
 
               if (data.error) {
                  console.log(data);
                  alert(data.error);
                  return;
               }
+
+              thumb.view.exif=data.exif;
 
               // get GPS coordinates
               try {
@@ -213,7 +269,7 @@ var viewer={
                 }).addTo(viewer.map);
 
                 // show first marker on the map
-                if (viewer.thumbs.current==0) {
+                if (thumbIndex==0) {
                   console.log(lon,lat);
                   viewer.map.setView([lat,lon]);
                 }
@@ -224,29 +280,34 @@ var viewer={
 
           });
 
-          // resize image
-          loadImage(blob,function complete(result){
-            if (result.error) {
-              console.log(result);
-              alert(error);
+          function resizeImage() {
 
-            } else {
-              // display thumbnail
-              var canvas=result;
-              $('#thumbnails [data-key='+thumb.view.key+'] i').css({
-                backgroundImage: 'url('+canvas.toDataURL()+')'
-              });
+            // resize image
+            loadImage(viewer.thumbs[thumbIndex].url,function complete(result){
+              if (result.error) {
+                console.log(result);
+                alert(error);
 
-            }
+              } else {
+                // display thumbnail
+                var canvas=result;
+                $('#thumbnails [data-key='+thumb.view.key+'] i').css({
+                  backgroundImage: 'url('+canvas.toDataURL()+')'
+                });
 
-            // load next thumbnail
-            setTimeout(viewer.loadThumbnails);
+              }
 
-          },{
-            maxWidth: 192,
-            canvas: true,
-            orientation: true
-          });
+              // load next thumbnail
+              setTimeout(viewer.loadThumbnails);
+
+            },{
+              maxWidth: 192,
+              canvas: true,
+              orientation: true
+            });
+
+          } // resizeImage
+
 
         }
       });
