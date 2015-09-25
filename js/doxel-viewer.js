@@ -123,7 +123,7 @@ var viewer={
     *
     * default range to search for jpeg metadata
     */
-    metadata_size: 48*1024,
+    metadata_size: 50*1024,
 
     /**
     * @property viewer.mode
@@ -268,7 +268,7 @@ var viewer={
                 }
               } catch(e) {
                 console.log(e);
-                alert(e.message);
+                //alert(e.message);
               }
 
               try {
@@ -346,6 +346,13 @@ var viewer={
           } // resizeImage
 
 
+        },
+
+        error: function(){
+          console.log(arguments);
+          // thumbnail not found, delay next thumbnail
+          // TODO: display "no image"
+          setTimeout(viewer.loadThumbnails,300);
         }
       });
 
@@ -362,7 +369,9 @@ var viewer={
 
         // on showpose
         $(viewer).on('showpose',function(e,pose){
-          viewer.scrollTo({pose: pose, scrollInertia:0});
+          viewer.scrollTo({pose: pose});
+          $('#thumbnails a.selected').removeClass('selected');
+          $('#thumbnails a[data-pose='+pose+']').addClass('selected');
         });
 
     }, // viewer_setupEventHandlers
@@ -446,7 +455,7 @@ var viewer={
       var scrollLength=mCSBcontainer.width();
       var thumbPos=a.position().left;
       var visibleWidth=$('#thumbnails').width();
-      var scrollPos=Math.min(thumbPos-visibleWidth/2+a.width()/2,scrollLength-draggerMax);
+      var scrollPos=Math.max(Math.min(thumbPos-visibleWidth/2+a.width()/2,scrollLength-draggerMax),0);
 
       // update mCustomScrollbar content position
       mCSBcontainer.css('left',-scrollPos);

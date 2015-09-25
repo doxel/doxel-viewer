@@ -100,9 +100,12 @@ body {
   transform: scale(0.95);
 }
 
-
 #thumbnails a[data-pose] i {
   opacity: 0.9;
+}
+
+#thumbnails a.selected i, #thumbnails a.selected i {
+  border-color: yellow;
 }
 
 iframe.target {
