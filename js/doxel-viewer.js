@@ -508,7 +508,9 @@ var frustums={
       // init material
       var material=new THREE.MeshBasicMaterial({
         color: frustums.color,
-        wireframe: true
+        wireframe: true,
+        depthTest: false,
+        depthWrite: false
       });
 
       // init mesh
