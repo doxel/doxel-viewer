@@ -91,7 +91,6 @@ $(document).ready(function(){
       // warning: load event could be fired only one time per iframe
       frustums.init(this.contentWindow);
       viewer.showFirstPose();
-      setTimeout(viewer.playSequence,3000);
     })
     .attr('src',viewer.segmentURL+'/potree');
 
@@ -125,6 +124,11 @@ var viewer={
     * default range to search for jpeg metadata
     */
     metadata_size: 48*1024,
+
+    /**
+    * @property viewer.mode
+    */
+    mode: {},
 
     /**
     * @method viewer.init
@@ -170,7 +174,7 @@ var viewer={
           });
 
           // add thumbnail to html
-          html+='<a class="landscape" data-key="'+view.key+'"'+(view.extrinsics?' data-pose="'+view.extrinsics+'">':'>')+'<i></i></a>';
+          html+='<a class="landscape" data-key="'+view.key+'"'+(view.extrinsics!==undefined?' data-pose="'+view.extrinsics+'">':'>')+'<i></i></a>';
 
           thumbs.push({
             view: view,
@@ -206,6 +210,7 @@ var viewer={
         // stop on last thumb
         if (viewer.thumbs.current>=viewer.thumbs.length) {
           viewer.thumbs.current=undefined;
+          $('#thumbnails').trigger('load');
           return;
         }
       }
@@ -350,11 +355,15 @@ var viewer={
     * @method viewer.setupEventHandlers
     */
     setupEventHandlers: function viewer_setupEventHandlers() {
+        $('#thumbnails').on('load',viewer.play);
 
-        /**
-        * thumbnail click event handler
-        */
+        // thumbnail onclick
         $("#thumbnails").on("click","a", viewer.thumbnail_onclick);
+
+        // on showpose
+        $(viewer).on('showpose',function(e,pose){
+          viewer.scrollTo({pose: pose, scrollInertia:0});
+        });
 
     }, // viewer_setupEventHandlers
 
@@ -412,6 +421,42 @@ var viewer={
     }, // viewer_showPose
 
     /**
+    * @method viewer.scrollTo
+    *
+    * mCustomScrollbar immediate scrollto
+    */
+    scrollTo: function viewer_scrollTo(options){
+      var a;
+
+      if (options.pose!==undefined) {
+        a=$('#thumbnails a[data-pose='+options.pose+']');
+
+      } else if (options.view!==undefined) {
+        a=$('#thumbnails a[data-view='+options.view+']');
+      }
+
+      if (!a) return;
+
+      // compute mCustomScrollbar dragger and content position
+      var t=$('#thumbnails');
+      t.mCustomScrollbar('stop');
+      var mCSBcontainer=t.find('#mCSB_1_container');
+      var dragger=t.find('#mCSB_1_dragger_horizontal');
+      var draggerMax=parseInt(dragger.css('max-width'));
+      var scrollLength=mCSBcontainer.width();
+      var thumbPos=a.position().left;
+      var visibleWidth=$('#thumbnails').width();
+      var scrollPos=Math.min(thumbPos-visibleWidth/2+a.width()/2,scrollLength-draggerMax);
+
+      // update mCustomScrollbar content position
+      mCSBcontainer.css('left',-scrollPos);
+
+      // update mCustomScrollbar dragger position
+      dragger.css('left',scrollPos/scrollLength*draggerMax);
+
+    }, // viewer_scrollTo
+
+    /**
     * @method viewer.marker_onclick
     */
     marker_onclick: function viewer_marker_onclick(e){
@@ -432,33 +477,39 @@ var viewer={
     }, // viewer.showFirstPose
 
     /**
-    * @method viewer.playSequence
+    * @method viewer.play
     */
-    playSequence: function viewer_playSequence() {
+    play: function viewer_play() {
       var i=0;
       var incr;
 
       function showNextPose() {
 
-        if (viewer.mode=='play') {
-          requestAnimationFrame(showNextPose);
-        } else {
+        if (!viewer.mode.play) {
           return;
         }
 
-        if (i==viewer.data.extrinsics.length-1) {
-          incr=-1;
-        } else if (i==0) {
-          incr=1;
+        requestAnimationFrame(showNextPose);
+
+        viewer.showPose(i++);
+
+        // on last frame
+        if (i>=viewer.data.extrinsics.length) {
+          // loop
+          if (viewer.mode.loop) {
+            i=0;
+          } else {
+            // or stop
+            viewer.mode.play=false;
+            $(viewer).trigger('stop');
+          }
         }
-        viewer.showPose(i);
-        i+=incr;
       }
 
-      viewer.mode='play';
+      viewer.mode.play=true;
       showNextPose();
 
-    } // viewer.playSequence
+    } // viewer.play
 
 } // viewer
 
