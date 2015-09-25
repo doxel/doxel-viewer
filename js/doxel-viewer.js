@@ -452,6 +452,11 @@ var frustums={
     color: 0xffff00,
 
     /**
+    * @property frustums.initialPose
+    */
+    initialPose: 0,
+
+    /**
     * @method frustums.init
     */
     init: function frustums_init(window) {
@@ -471,9 +476,17 @@ var frustums={
     * @method frustums.setupEventHandlers
     */
     setupEventHandlers: function frustums_setupEventHandlers(){
+
       $(viewer).on('showpose',function(e,pose){
-        frustums.mesh.geometry.drawcalls[0].start=pose*18;
+        if (!frustums.mesh) {
+          frustums.initialPose=pose;
+
+        } else {
+          frustums.mesh.geometry.drawcalls[0].start=pose*18;
+
+        }
       });
+
     }, // frustums.setupEventHandlers
 
     /**
@@ -503,7 +516,7 @@ var frustums={
       geometry.addAttribute('position', new THREE.BufferAttribute(frustums.position,3));
       geometry.addAttribute('index', new THREE.BufferAttribute(frustums.index,3));
 
-      geometry.addDrawCall(0,18,0);
+      geometry.addDrawCall(frustums.initialPose*18,18,0);
 
       // init material
       var material=new THREE.MeshBasicMaterial({
