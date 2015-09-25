@@ -91,6 +91,7 @@ $(document).ready(function(){
       // warning: load event could be fired only one time per iframe
       frustums.init(this.contentWindow);
       viewer.showFirstPose();
+      setTimeout(viewer.playSequence,3000);
     })
     .attr('src',viewer.segmentURL+'/potree');
 
@@ -137,7 +138,6 @@ var viewer={
           axis: 'x'
         });
 
-
         // init map
         var map = viewer.map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('//{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',{
@@ -147,8 +147,6 @@ var viewer={
         }).addTo(map);
 
         viewer.setupEventHandlers();
-
-        frustums.load();
 
     }, // viewer.init
 
@@ -431,7 +429,36 @@ var viewer={
       if (a.length) {
         viewer.showPose(a.data('pose'));
       }
-    } // viewer.showFirstPose
+    }, // viewer.showFirstPose
+
+    /**
+    * @method viewer.playSequence
+    */
+    playSequence: function viewer_playSequence() {
+      var i=0;
+      var incr;
+
+      function showNextPose() {
+
+        if (viewer.mode=='play') {
+          requestAnimationFrame(showNextPose);
+        } else {
+          return;
+        }
+
+        if (i==viewer.data.extrinsics.length-1) {
+          incr=-1;
+        } else if (i==0) {
+          incr=1;
+        }
+        viewer.showPose(i);
+        i+=incr;
+      }
+
+      viewer.mode='play';
+      showNextPose();
+
+    } // viewer.playSequence
 
 } // viewer
 
