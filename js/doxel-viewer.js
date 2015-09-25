@@ -177,7 +177,7 @@ var viewer={
           thumbs.push({
             view: view,
             url: viewer.segmentURL+'/'+view.value.ptr_wrapper.data.filename,
-            metadata_size: view.value.ptr_wrapper.data.metadata_size
+            metadata_size: view.value.ptr_wrapper.data.metadata_size||viewer.metadata_size
           });
 
         });
@@ -216,7 +216,7 @@ var viewer={
       $.ajax({
         dataType: 'native',
         url: viewer.thumbs[viewer.thumbs.current].url,
-        headers: { 'Range' : 'bytes=0-'+viewer.thumbs[viewer.thumbs.current].metadata_size||viewer.metadata_size },
+        headers: { 'Range' : 'bytes=0-'+viewer.thumbs[viewer.thumbs.current].metadata_size },
         xhrFields: {
           responseType: 'blob'
         },
