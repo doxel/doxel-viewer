@@ -45,35 +45,56 @@ loadImage.getExifThumbnail=function(dataview, offset, length) {
 function getParam(name) {
   var list=window.location.search.substring(1).replace(/=/,'&').split('&');
   var index=list.indexOf(name);
-  return (index<0)?undefined:decodeURIComponent(list[index+1]); 
+  return (index<0)?undefined:decodeURIComponent(list[index+1]);
 }
 
 $(document).ready(function(){
 
+    // read src query parameter
     var src=getParam('src');
     viewer.segmentURL='upload/2015/09/02/14412040/2f4acd908588c2590ee06cb67187c85b/1441204044_000000';
     viewer.segmentURL='upload/2015/08/23/14403273/2f4acd908588c2590ee06cb67187c85b/1440327326_000000';
+
+    // use either the specified src, or document.referrer or predefined segmentURL
     src=src||document.referrer||viewer.segmentURL;
     src=src.replace(/\/[^\/]+.html$/,'');
 
-    // remove hostname from src on same origin
+    // remove hostname when src and window are from the same origin
     if (src.substring(0,window.location.origin.length+1)==window.location.origin+'/') {
       src=src.substring(window.location.origin.length);
     }
 
-    if (document.location.pathname.replace(/[^\/]+.html$/,'')!=src) {
+    // get window location directory
+    var pathname=document.location.pathname.replace(/[^\/]+.html$/,'');
+
+    // override predefined segmentURL with src or referrer
+    if (pathname!=src) {
       viewer.segmentURL=src;
     }
 
-    // change url
+    // remove leading window pathname from segment pathname
+    // (get the relative path)
+    if (viewer.segmentURL.substr(0,pathname.length)==pathname) {
+      viewer.segmentURL=viewer.segmentURL.substr(pathname.length);
+    }
+
+    // change url in address bar and push history state
     if (window.location.search!='?src='+viewer.segmentURL) {
       History.pushState({
-        src: src
+        src: viewer.segmentURL
       },null,'?src='+viewer.segmentURL);
     }
 
-    $('iframe').attr('src',viewer.segmentURL+'/potree');
+    // load potree viewer
+    $('iframe')
+    .on('load',function(){
+      // warning: load event could be fired only one time per iframe
+      frustums.init(this.contentWindow);
+      viewer.showFirstPose();
+    })
+    .attr('src',viewer.segmentURL+'/potree');
 
+    // initialize doxel-viewer
     $.ajax({
       url: viewer.segmentURL+'/viewer.json',
       success: function(json) {
@@ -85,6 +106,7 @@ $(document).ready(function(){
       }
     });
 
+    // resize potree viewer iframe
     $(window).on('resize',function(){
       $('iframe').height(window.innerHeight-$('iframe').offset().top);
     }).resize();
@@ -125,6 +147,8 @@ var viewer={
         }).addTo(map);
 
         viewer.setupEventHandlers();
+
+        frustums.load();
 
     }, // viewer.init
 
@@ -204,24 +228,26 @@ var viewer={
           // extract exif data (thumbnail could be here)
           loadImage.parseMetaData(blob, function(data) {
 
-              if (data.exif && data.exif.Thumbnail) {
-                $('#thumbnails [data-key='+thumb.view.key+'] i').css({
-                  backgroundImage: 'url('+data.exif.Thumbnail+')'
-                });
-
-                // load next thumbnail
-                setTimeout(viewer.loadThumbnails);
-
-              } else {
-                resizeImage();
-              }
-
               if (data.error) {
                  console.log(data);
                  alert(data.error);
                  return;
               }
 
+              if (data.exif && data.exif.Thumbnail) {
+                $('#thumbnails [data-key='+thumb.view.key+'] i').css({
+                  backgroundImage: 'url('+data.exif.Thumbnail+')'
+                });
+
+                // load next thumbnail
+                setTimeout(viewer.loadThumbnails,10);
+
+              } else {
+                // no thumbnail in jpeg (should not happend)
+                resizeImage();
+              }
+
+              // keep exif data handy
               thumb.view.exif=data.exif;
 
               // get GPS coordinates
@@ -265,14 +291,22 @@ var viewer={
 
                 // add marker to the map
                 thumb.view.marker=L.marker([lat,lon], {
-                  title: thumb.view.value.ptr_wrapper.data.filename.replace(/\.[^\.]+$/,'')
-                }).addTo(viewer.map);
+                  key: thumb.view.key,
+                  pose: thumb.view.extrinsics,
+                  title: thumb.view.value.ptr_wrapper.data.filename.replace(/\.[^\.]+$/,''),
+                  clickable: true
+                })
+                .addTo(viewer.map)
+                .on('click',viewer.marker_onclick);
 
-                // show first marker on the map
-                if (thumbIndex==0) {
-                  console.log(lon,lat);
+                // show map on first marker added
+                if (!$('#mapwrap').hasClass('visible')) {
+                  $('#mapwrap').addClass('visible');
+
+                  // centered on first marker
                   viewer.map.setView([lat,lon]);
                 }
+
               }
 
           }, {
@@ -298,7 +332,7 @@ var viewer={
               }
 
               // load next thumbnail
-              setTimeout(viewer.loadThumbnails);
+              setTimeout(viewer.loadThumbnails,10);
 
             },{
               maxWidth: 192,
@@ -319,51 +353,238 @@ var viewer={
     */
     setupEventHandlers: function viewer_setupEventHandlers() {
 
-        var _window=$('iframe')[0].contentWindow;
-
         /**
         * thumbnail click event handler
         */
-        $("#thumbnails").on("click","a",function(e) {
+        $("#thumbnails").on("click","a", viewer.thumbnail_onclick);
 
-          // target pose index
-          var pose=this.dataset.pose;
+    }, // viewer_setupEventHandlers
 
-          if (pose!==undefined) {
+    /**
+    * @method viewer.thumbnail_onclick
+    */
+    thumbnail_onclick: function viewer_thumbnail_onclick(e){
 
-            // set camera position to extrinsic center
-            var camera=_window.camera;
-            camera.position.fromArray(viewer.data.extrinsics[pose].value.center);
+      // target pose index
+      var pose=this.dataset.pose;
+      if (pose!==undefined) {
+        viewer.showPose(pose);
 
-            // adjust camera up vector
-            camera.up.y=-1;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
 
-            // set camera rotation matrix
-            var rotation=viewer.data.extrinsics[pose].value.rotation;
-            var R=new _window.THREE.Matrix3().fromArray(rotation[0].concat(rotation[1]).concat(rotation[2]));
+    }, // viewer.thumbnail_onclick
 
-            // compute the camera lookAt vector
-            // unit vector
-            var lookAt=new _window.THREE.Vector3(0,0,1);
-            // apply camera rotation
-            lookAt.applyMatrix3(R);
-            // translate to camera center
-            lookAt.x+=camera.position.x;
-            lookAt.y+=camera.position.y;
-            lookAt.z+=camera.position.z;
+    /**
+    * @method viewer.showPose
+    */
+    showPose: function viewer_showPowse(pose){
 
-            // copy the lookAt vector to controls targets
-            _window.controls.target.copy(lookAt);
-            _window.controls.target0.copy(lookAt);
+      var _window=$('iframe')[0].contentWindow;
 
-          }
+      // set camera position to extrinsic center
+      var camera=_window.camera;
+      camera.position.fromArray(viewer.data.extrinsics[pose].value.center);
 
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
+      // adjust camera up vector
+      camera.up.y=-1;
 
-        }); // thumbnail click event handler
+      // set camera rotation matrix
+      var rotation=viewer.data.extrinsics[pose].value.rotation;
+      var R=new _window.THREE.Matrix3().fromArray(rotation[0].concat(rotation[1]).concat(rotation[2]));
 
-    } // viewer_setupEventHandlers
+      // compute the camera lookAt vector
+      // unit vector
+      var lookAt=new _window.THREE.Vector3(0,0,1);
+      // apply camera rotation
+      lookAt.applyMatrix3(R);
+      // translate to camera center
+      lookAt.x+=camera.position.x;
+      lookAt.y+=camera.position.y;
+      lookAt.z+=camera.position.z;
+
+      // copy the lookAt vector to controls targets
+      _window.controls.target.copy(lookAt);
+      _window.controls.target0.copy(lookAt);
+
+      $(viewer).trigger('showpose',[pose]);
+
+    }, // viewer_showPose
+
+    /**
+    * @method viewer.marker_onclick
+    */
+    marker_onclick: function viewer_marker_onclick(e){
+      var marker=this;
+      if (marker.options.pose) {
+        viewer.showPose(marker.options.pose);
+      }
+    }, // viewer.marker_onclick
+
+    /**
+    * @method viewer.showFirstPose
+    */
+    showFirstPose: function viewer_showFirstPose() {
+      var a=$('#thumbnails a[data-pose]:first');
+      if (a.length) {
+        viewer.showPose(a.data('pose'));
+      }
+    } // viewer.showFirstPose
 
 } // viewer
+
+
+/**
+* @object frustums
+*/
+var frustums={
+
+    /**
+    * @property frustums.url
+    */
+    url: 'frustums.ply',
+
+    /**
+    * @property frustums.color
+    */
+    color: 0xffff00,
+
+    /**
+    * @method frustums.init
+    */
+    init: function frustums_init(window) {
+
+      frustums.window=window;
+
+      frustums.load(function(ply){
+        frustums.parse_ply(window,ply);
+        frustums.addToScene();
+      });
+
+      frustums.setupEventHandlers();
+
+    }, //  frustums.init
+
+    /**
+    * @method frustums.setupEventHandlers
+    */
+    setupEventHandlers: function frustums_setupEventHandlers(){
+      $(viewer).on('showpose',function(e,pose){
+        frustums.mesh.geometry.drawcalls[0].start=pose*18;
+      });
+    }, // frustums.setupEventHandlers
+
+    /**
+    * @method frustums.load
+    */
+    load: function frustums_load(callback) {
+      $.ajax({
+        url: viewer.segmentURL+'/'+frustums.url,
+        dataType: 'text',
+        success: callback,
+        error: function() {
+          alert('Could not load '+frustums.url);
+        }
+      });
+
+    }, // frustums.load
+
+    /**
+    * @method frustums.addToScene
+    */
+    addToScene: function frustums_addToScene() {
+      var window=frustums.window;
+      var THREE=window.THREE;
+
+      // init geometry
+      var geometry=new THREE.BufferGeometry();
+      geometry.addAttribute('position', new THREE.BufferAttribute(frustums.position,3));
+      geometry.addAttribute('index', new THREE.BufferAttribute(frustums.index,3));
+
+      geometry.addDrawCall(0,18,0);
+
+      // init material
+      var material=new THREE.MeshBasicMaterial({
+        color: frustums.color,
+        wireframe: true
+      });
+
+      // init mesh
+      frustums.mesh=new THREE.Mesh(geometry,material);
+
+      window.scene.add(frustums.mesh);
+
+    }, // frustums.addToScene
+
+    /**
+    * @method frustums.parse_ply
+    */
+    parse_ply: function frustums_parse_ply(w,ply) {
+
+      ply=ply.replace(/ +/g,' ').replace(/\n /g,'\n').split('\n');
+
+      // validate ply header
+      if (ply.length<14) throw "Parse error";
+      ply[2]=ply[2].split('element vertex');
+
+      if (ply[0]!='ply') throw "Parse error";
+      if (ply[1]!='format ascii 1.0') throw "Parse error";
+      if (ply[2][0]!="" || !Number(ply[2][1])) throw "Parse error";
+      if (ply[8]!='end_header') throw "Parse error";
+
+      // extract vertex count
+      var vertex_count=frustums.vertex_count=Number(ply[2][1]);
+
+      // allocate storage for position attribute
+      var position=frustums.position=new w.Float32Array(vertex_count*3);
+
+      // extract vertex positions
+      var id=0;
+      var offset=9;
+      for (var i=0; i<vertex_count; ++i) {
+        var xyz=ply[offset+i].split(' ');
+        if (xyz.length>3) throw "Parse error";
+        position[id++]=xyz[0];
+        position[id++]=xyz[1];
+        position[id++]=xyz[2];
+      }
+      offset+=vertex_count;
+      console.log(id,vertex_count*3);
+
+      // allocate storage for index attribute
+      var index=frustums.index=new w.Uint16Array(frustums.vertex_count*3+(frustums.vertex_count/5)*3);
+      id=0;
+
+      // extract mesh indexes
+      for (var i=0; i<vertex_count; ++i) {
+
+        var list=ply[offset+i].split(' ');
+        var count=list[0];
+
+        if (count==3) {
+          index[id++]=list[1];
+          index[id++]=list[2];
+          index[id++]=list[3];
+
+        } else if (count==4) {
+          index[id++]=list[1];
+          index[id++]=list[2];
+          index[id++]=list[3];
+          index[id++]=list[2];
+          index[id++]=list[4];
+          index[id++]=list[3];
+
+        } else {
+          throw "Parse error";
+        }
+      }
+
+      console.log(id,vertex_count*3+(vertex_count/5)*3);
+
+    } // frustums.parse_ply
+
+}
+
+

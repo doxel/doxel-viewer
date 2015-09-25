@@ -119,6 +119,7 @@ iframe.target {
 
 
 div#mapwrap {
+  visibility: hidden;
   position: absolute;
   bottom: 16px;
   left: 16px;
@@ -130,5 +131,9 @@ div#mapwrap {
 
 div#map {
   height: 192px;
+}
+
+div#mapwrap.visible {
+  visibility: visible;
 }
 
