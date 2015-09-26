@@ -421,9 +421,15 @@ var viewer={
       lookAt.y+=camera.position.y;
       lookAt.z+=camera.position.z;
 
-      // copy the lookAt vector to controls targets
-      _window.controls.target.copy(lookAt);
-      _window.controls.target0.copy(lookAt);
+      if (_window.controls.target) {
+        // copy the lookAt vector to orbit controls targets
+        _window.controls.target.copy(lookAt);
+        _window.controls.target0.copy(lookAt);
+
+      } else {
+        // set the camera lookAt vector
+        camera.lookAt(lookAt);
+      }
 
       $(viewer).trigger('showpose',[pose]);
 
