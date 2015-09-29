@@ -9,4 +9,4 @@
 	url = https://github.com/browserstate/history.js
 [submodule "js/thirdparty/malihu-custom-scrollbar"]
 	path = js/thirdparty/malihu-custom-scrollbar
-	url = git@github.com:malihu/malihu-custom-scrollbar-plugin.git
+	url = https://github.com/bugdanov/malihu-custom-scrollbar-plugin.git
