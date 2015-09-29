@@ -407,15 +407,9 @@ var viewer={
       // adjust camera up vector
       camera.up.y=-1;
 
-      // set camera rotation matrix
-      var rotation=viewer.data.extrinsics[pose].value.rotation;
-      var R=new _window.THREE.Matrix3().fromArray(rotation[0].concat(rotation[1]).concat(rotation[2]));
+      // the camera lookAt vector is the third line of the camera rotation matrix
+      var lookAt=new _window.THREE.Vector3().fromArray(viewer.data.extrinsics[pose].value.rotation[2]);
 
-      // compute the camera lookAt vector
-      // unit vector
-      var lookAt=new _window.THREE.Vector3(0,0,1);
-      // apply camera rotation
-      lookAt.applyMatrix3(R);
       // translate to camera center
       lookAt.x+=camera.position.x;
       lookAt.y+=camera.position.y;
