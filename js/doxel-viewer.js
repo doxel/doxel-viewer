@@ -339,9 +339,14 @@ var viewer={
               } else {
                 // display thumbnail
                 var canvas=result;
-                $('#thumbnails [data-key='+thumb.view.key+'] i').css({
-                  backgroundImage: 'url('+canvas.toDataURL()+')'
-                });
+                if (canvas.toDataURL) {
+                  $('#thumbnails [data-key='+thumb.view.key+'] i').css({
+                    backgroundImage: 'url('+canvas.toDataURL()+')'
+                  });
+                } else {
+                  console.log(result);
+                  alert('load error: '+viewer.thumbs[thumbIndex].url);
+                }
 
               }
 
