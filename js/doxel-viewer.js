@@ -126,6 +126,11 @@ var viewer={
     metadata_size: 50*1024,
 
     /**
+    * @property viewer.posesOnly
+    */
+    posesOnly: true,
+
+    /**
     * @property viewer.mode
     */
     mode: {},
@@ -139,7 +144,10 @@ var viewer={
         viewer.loadThumbnails();
 
         $('#thumbnails').mCustomScrollbar({
-          axis: 'x'
+          axis: 'x',
+          callbacks: {
+            whileScrolling: viewer.whileScrolling
+          }
         });
 
         // init map
@@ -173,6 +181,8 @@ var viewer={
             }
           });
 
+          if (view.extrinsics==undefined && viewer.posesOnly) return true;
+	
           // add thumbnail to html
           html+='<a class="landscape" data-key="'+view.key+'"'+(view.extrinsics!==undefined?' data-pose="'+view.extrinsics+'">':'>')+'<i></i></a>';
 
@@ -185,8 +195,9 @@ var viewer={
         });
 
         // display thumbnails and set container width
-        $(html).appendTo('#thumbnails .content');
-        $('#thumbnails .content').width(viewer.data.views.length*(192+8));
+        var content=$('#thumbnails .content');
+        $(html).appendTo(content);
+        $('#thumbnails .content').width(content[0].childNodes.length*(192+8));
 
     }, // viewer.addThumbnails
 
@@ -352,7 +363,7 @@ var viewer={
           console.log(arguments);
           // thumbnail not found, delay next thumbnail
           // TODO: display "no image"
-          setTimeout(viewer.loadThumbnails,300);
+          setTimeout(viewer.loadThumbnails,0);
         }
       });
 
@@ -368,8 +379,9 @@ var viewer={
         $("#thumbnails").on("click","a", viewer.thumbnail_onclick);
 
         // on showpose
-        $(viewer).on('showpose',function(e,pose){
-          viewer.scrollTo({pose: pose});
+        $(viewer).on('showpose',function(e,pose,scrolling){
+          pose=Math.floor(pose);
+          if (!scrolling) viewer.scrollTo({pose: pose});
           $('#thumbnails a.selected').removeClass('selected');
           $('#thumbnails a[data-pose='+pose+']').addClass('selected');
         });
@@ -395,22 +407,93 @@ var viewer={
 
     /**
     * @method viewer.showPose
+    *
+    * Show the specified pose and trigger viewer the 'showpose' event.
+    * If the pose specified is not an integer value, camera position and
+    * rotation will be interpolated
+    *
+    * @param {Number} [poseIndex] The pose to show, or an intermediate value.
+    *
     */
-    showPose: function viewer_showPowse(pose){
+    showPose: function viewer_showPowse(poseIndex,scrolling){
 
       var _window=$('iframe')[0].contentWindow;
+      var camera=_window.camera;
+      var THREE=_window.THREE;
+      var lookAt;
+
+      var pose0={
+        index: Math.floor(poseIndex)
+      }
+      var frac=poseIndex-pose0.index;
+
+      // get pose extrinsics
+      pose0.extrinsics=viewer.data.extrinsics[pose0.index];
+      if (!pose0.extrinsics) return;
+
+      // get pose camera up vector
+      pose0.up=pose0.extrinsics.value.rotation[1];
 
       // set camera position to extrinsic center
-      var camera=_window.camera;
-      camera.position.fromArray(viewer.data.extrinsics[pose].value.center);
-
-      // adjust camera up vector
-      camera.up.y=-1;
+      pose0.center=pose0.extrinsics.value.center;
 
       // the camera lookAt vector is the third line of the camera rotation matrix
-      var lookAt=new _window.THREE.Vector3().fromArray(viewer.data.extrinsics[pose].value.rotation[2]);
+      pose0.out=pose0.extrinsics.value.rotation[2];
 
-      // translate to camera center
+      // compute intermediate camera position/rotation
+      if (frac && pose0.index+1<viewer.data.extrinsics.length) {
+        var pose1={
+          index: pose0.index+1
+        }
+        pose1.extrinsics=viewer.data.extrinsics[pose1.index];
+        if (pose1.extrinsics) {
+
+          // get camera up vector for next frame
+          pose1.up=pose1.extrinsics.value.rotation[1];
+
+          // adjust scene camera up vector
+          camera.up.set(
+            -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+            -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+            -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+          );
+
+          // get camera lookAt vector for next frame
+          pose1.out=pose1.extrinsics.value.rotation[2];
+
+          // adjust camera lookAt vector
+          lookAt=new THREE.Vector3(
+            pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
+            pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
+            pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
+          );
+
+          // get next camera position
+          pose1.center=pose1.extrinsics.value.center;
+
+          // adjust camera position
+          camera.position.set(
+            pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
+            pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
+            pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac
+          );
+        }
+
+      } else {
+        // set camera lookAt vector direction
+        lookAt=new THREE.Vector3(pose0.out[0],pose0.out[1],pose0.out[2]);
+
+        // set camera up vector
+        camera.up.set(-pose0.up[0],-pose0.up[1],-pose0.up[2]);
+
+        // set camera position
+        camera.position.x=pose0.center[0];
+        camera.position.y=pose0.center[1];
+        camera.position.z=pose0.center[2];
+
+      }
+
+      // translate lookAt vector to camera position
       lookAt.x+=camera.position.x;
       lookAt.y+=camera.position.y;
       lookAt.z+=camera.position.z;
@@ -425,7 +508,7 @@ var viewer={
         camera.lookAt(lookAt);
       }
 
-      $(viewer).trigger('showpose',[pose]);
+      $(viewer).trigger('showpose',[poseIndex,scrolling]);
 
     }, // viewer_showPose
 
@@ -500,7 +583,7 @@ var viewer={
 
         requestAnimationFrame(showNextPose);
 
-        viewer.showPose(i++);
+        viewer.showPose(i+=0.1);
 
         // on last frame
         if (i>=viewer.data.extrinsics.length) {
@@ -518,8 +601,15 @@ var viewer={
       viewer.mode.play=true;
       showNextPose();
 
-    } // viewer.play
+    }, // viewer.play
 
+    /**
+    * @method viewer.whileScrolling
+    */
+    whileScrolling: function viewer_whileScrolling() {
+      var poses=$('#thumbnails a[data-pose]');
+      viewer.showPose(poses.length*this.mcs.leftPct/100,true);
+    }
 } // viewer
 
 
@@ -564,11 +654,12 @@ var frustums={
     */
     setupEventHandlers: function frustums_setupEventHandlers(){
 
-      $(viewer).on('showpose',function(e,pose){
+      $(viewer).on('showpose',function(e,pose,scrolling){
         if (!frustums.mesh) {
           frustums.initialPose=pose;
 
         } else {
+          frustums.mesh.visible=(pose-Math.floor(pose)==0) && !viewer.mode.play && !viewer.mode.scrolling;
           frustums.mesh.geometry.drawcalls[0].start=pose*18;
 
         }
@@ -688,5 +779,4 @@ var frustums={
     } // frustums.parse_ply
 
 }
-
 
