@@ -141,7 +141,7 @@ var viewer={
     init: function viewer_init() {
 
         viewer.addThumbnails();
-        viewer.loadThumbnails();
+        viewer.getJpegMetadata(viewer.loadThumbnails);
 
         $('#thumbnails').mCustomScrollbar({
           axis: 'x',
@@ -202,6 +202,85 @@ var viewer={
     }, // viewer.addThumbnails
 
     /**
+    * @method viewer.getJpegMetadata
+    */
+    getJpegMetadata: function viewer_getJpegMetadata(callback) {
+
+      viewer.getJpegMetadataIndex(function(){
+        viewer.jpeg_table=null;
+
+        if (!viewer.jpeg_index) {
+          // no index found, download jpeg metadata and thumbnails directly from jpeg files
+          callback();
+          return;
+        }
+
+        // load jpeg metadata array
+        $.ajax({
+          url: viewer.segmentURL+'/jpeg_metadata.bin',
+          dataType: 'native',
+          xhrFields: {
+            responseType: 'blob'
+          },
+
+          success: function(blob) {
+            if (blob && (blob instanceof Blob)) {
+              viewer.jpeg_table=blob;
+              callback();
+
+            } else {
+              console.log(arguments);
+              alert ('Error: could not load segment jpeg metadata table');
+              callback();
+            }
+
+          },
+
+          error: function() {
+            console.log(arguments);
+            alert ('Error: server error - could not load segment jpeg metadata table');
+            callback();
+          }
+
+        });
+      });
+
+    }, // viewer.getJpegMetadata
+
+    /**
+    * @method viewer.getJpegMetadataIndex
+    */
+    getJpegMetadataIndex: function viewer_getJpegMetadataIndex(callback) {
+      viewer.jpeg_index=null;
+
+      $.ajax({
+        url: viewer.segmentURL+'/jpeg_metadata_index.bin',
+        dataType: 'native',
+        xhrFields: {
+          responseType: 'arraybuffer',
+        },
+
+        success: function(buffer) {
+          if (buffer && (buffer instanceof ArrayBuffer)) {
+            viewer.jpeg_index=new Uint32Array(buffer);
+            callback();
+
+          } else {
+            alert ('Error: could not load segment jpeg metadata index');
+            callback();
+          }
+        },
+
+        error: function() {
+            alert ('Error: server error: could not load segment jpeg metadata index');
+            callback();
+        }
+
+      });
+
+    }, // viewer.getJpegMetadataIndex
+
+    /**
     * @method viewer.loadThumbnails
     *
     * called recursively
@@ -226,153 +305,169 @@ var viewer={
         }
       }
 
-      // load image as blob (TODO: use a web worker)
-      $.ajax({
-        dataType: 'native',
-        url: viewer.thumbs[viewer.thumbs.current].url,
-        headers: { 'Range' : 'bytes=0-'+viewer.thumbs[viewer.thumbs.current].metadata_size },
-        xhrFields: {
-          responseType: 'blob'
-        },
-        success: function(blob) {
+      if (viewer.jpeg_table) {
+        var start=viewer.jpeg_index[viewer.thumbs.current];
+        var end=viewer.jpeg_index[viewer.thumbs.current+1];
+        var blob=viewer.jpeg_table.slice(start,end,'image/jpeg');
+        viewer.parseMetadata(blob);
 
-          var thumb=viewer.thumbs[viewer.thumbs.current];
-          var thumbIndex=viewer.thumbs.current;
+      } else {
+        // fallback to load jpeg headers one per one
+        // (TODO: use a web worker)
+        $.ajax({
+          dataType: 'native',
+          url: viewer.thumbs[viewer.thumbs.current].url,
+          headers: { 'Range' : 'bytes=0-'+viewer.thumbs[viewer.thumbs.current].metadata_size },
+          xhrFields: {
+            responseType: 'blob'
+          },
 
-          // extract exif data (thumbnail could be here)
-          loadImage.parseMetaData(blob, function(data) {
+          success: function(blob) {
+            viewer.parseMetadata(blob);
+          },
 
-              if (data.error) {
-                 console.log(data);
-                 alert(data.error);
-                 return;
-              }
-
-              if (data.exif && data.exif.Thumbnail) {
-                $('#thumbnails [data-key='+thumb.view.key+'] i').css({
-                  backgroundImage: 'url('+data.exif.Thumbnail+')'
-                });
-
-                // load next thumbnail
-                setTimeout(viewer.loadThumbnails,10);
-
-              } else {
-                // no thumbnail in jpeg (should not happend)
-                resizeImage();
-              }
-
-              // keep exif data handy
-              thumb.view.exif=data.exif;
-
-              // get GPS coordinates
-              try {
-                var dms=data.exif.get('GPSLongitude');
-                if (dms) {
-                  // convert to decimal
-                  var lon=thumb.view.lon=parseInt(dms[0])+parseInt(dms[1])/60+parseInt(dms[2])/3600;
-
-                  // set negative value for west coordinate
-                  if (data.exif.get('GPSLongitudeRef')=='W') {
-                    thumb.view.lon=-Math.abs(lon);
-                  }
-
-                }
-              } catch(e) {
-                console.log(e);
-                //alert(e.message);
-              }
-
-              try {
-                var dms=data.exif.get('GPSLatitude');
-
-                if (dms) {
-                  // convert to signed decimal
-                  var lat=thumb.view.lat=parseInt(dms[0])+parseInt(dms[1])/60+parseInt(dms[2])/3600;
-
-                  // set negative value for south coordinate
-                  if (data.exif.get('GPSLatitudeRef')=='S') {
-                    thumb.view.lat=-Math.abs(lat);
-                  }
-
-                }
-
-              } catch(e) {
-                console.log(e);
-                alert(e.message);
-              }
-
-              if (lon!==undefined && lat!==undefined) {
-
-                // add marker to the map
-                thumb.view.marker=L.marker([lat,lon], {
-                  key: thumb.view.key,
-                  pose: thumb.view.extrinsics,
-                  title: thumb.view.value.ptr_wrapper.data.filename.replace(/\.[^\.]+$/,''),
-                  clickable: true
-                })
-                .addTo(viewer.map)
-                .on('click',viewer.marker_onclick);
-
-                // show map on first marker added
-                if (!$('#mapwrap').hasClass('visible')) {
-                  $('#mapwrap').addClass('visible');
-
-                  // centered on first marker
-                  viewer.map.setView([lat,lon]);
-                }
-
-              }
-
-          }, {
-            maxMetaDataSize: 262144
-
-          });
-
-          function resizeImage() {
-
-            // resize image
-            loadImage(viewer.thumbs[thumbIndex].url,function complete(result){
-              if (result.error) {
-                console.log(result);
-                alert(error);
-
-              } else {
-                // display thumbnail
-                var canvas=result;
-                if (canvas.toDataURL) {
-                  $('#thumbnails [data-key='+thumb.view.key+'] i').css({
-                    backgroundImage: 'url('+canvas.toDataURL()+')'
-                  });
-                } else {
-                  console.log(result);
-                  alert('load error: '+viewer.thumbs[thumbIndex].url);
-                }
-
-              }
-
-              // load next thumbnail
-              setTimeout(viewer.loadThumbnails,10);
-
-            },{
-              maxWidth: 192,
-              canvas: true,
-              orientation: true
-            });
-
-          } // resizeImage
-
-
-        },
-
-        error: function(){
-          console.log(arguments);
-          // thumbnail not found, delay next thumbnail
-          // TODO: display "no image"
-          setTimeout(viewer.loadThumbnails,0);
-        }
-      });
+          error: function(){
+            console.log(arguments);
+            // thumbnail not found, delay next thumbnail
+            // TODO: display "no image"
+            setTimeout(viewer.loadThumbnails,0);
+          }
+        });
+      }
 
     }, // viewer.loadThumbnails
+
+    /**
+    * @method viewer.parseMetadata
+    */
+    parseMetadata: function viewer_parseMetadata(blob) {
+
+      var thumb=viewer.thumbs[viewer.thumbs.current];
+      var thumbIndex=viewer.thumbs.current;
+
+      // extract exif data (thumbnail could be here)
+      loadImage.parseMetaData(blob, function(data) {
+
+          if (data.error) {
+             console.log(data);
+             alert(data.error);
+             return;
+          }
+
+          if (data.exif && data.exif.Thumbnail) {
+            $('#thumbnails [data-key='+thumb.view.key+'] i').css({
+              backgroundImage: 'url('+data.exif.Thumbnail+')'
+            });
+
+            // load next thumbnail
+            setTimeout(viewer.loadThumbnails,10);
+
+          } else {
+            // no thumbnail in jpeg (should not happend)
+            resizeImage();
+          }
+
+          // keep exif data handy
+          thumb.view.exif=data.exif;
+
+          // get GPS coordinates
+          try {
+            var dms=data.exif.get('GPSLongitude');
+            if (dms) {
+              // convert to decimal
+              var lon=thumb.view.lon=parseInt(dms[0])+parseInt(dms[1])/60+parseInt(dms[2])/3600;
+
+              // set negative value for west coordinate
+              if (data.exif.get('GPSLongitudeRef')=='W') {
+                thumb.view.lon=-Math.abs(lon);
+              }
+
+            }
+          } catch(e) {
+            console.log(e);
+            //alert(e.message);
+          }
+
+          try {
+            var dms=data.exif.get('GPSLatitude');
+
+            if (dms) {
+              // convert to signed decimal
+              var lat=thumb.view.lat=parseInt(dms[0])+parseInt(dms[1])/60+parseInt(dms[2])/3600;
+
+              // set negative value for south coordinate
+              if (data.exif.get('GPSLatitudeRef')=='S') {
+                thumb.view.lat=-Math.abs(lat);
+              }
+
+            }
+
+          } catch(e) {
+            console.log(e);
+            alert(e.message);
+          }
+
+          if (lon!==undefined && lat!==undefined) {
+
+            // add marker to the map
+            thumb.view.marker=L.marker([lat,lon], {
+              key: thumb.view.key,
+              pose: thumb.view.extrinsics,
+              title: thumb.view.value.ptr_wrapper.data.filename.replace(/\.[^\.]+$/,''),
+              clickable: true
+            })
+            .addTo(viewer.map)
+            .on('click',viewer.marker_onclick);
+
+            // show map on first marker added
+            if (!$('#mapwrap').hasClass('visible')) {
+              $('#mapwrap').addClass('visible');
+
+              // centered on first marker
+              viewer.map.setView([lat,lon]);
+            }
+
+          }
+
+      }, {
+        maxMetaDataSize: 262144
+
+      });
+
+      function resizeImage() {
+
+        // resize image
+        loadImage(viewer.thumbs[thumbIndex].url,function complete(result){
+          if (result.error) {
+            console.log(result);
+            alert(error);
+
+          } else {
+            // display thumbnail
+            var canvas=result;
+            if (canvas.toDataURL) {
+              $('#thumbnails [data-key='+thumb.view.key+'] i').css({
+                backgroundImage: 'url('+canvas.toDataURL()+')'
+              });
+            } else {
+              console.log(result);
+              alert('load error: '+viewer.thumbs[thumbIndex].url);
+            }
+
+          }
+
+          // load next thumbnail
+          setTimeout(viewer.loadThumbnails,10);
+
+        },{
+          maxWidth: 192,
+          canvas: true,
+          orientation: true
+        });
+
+      } // resizeImage
+
+    }, // viewer.parseMetadata
 
     /**
     * @method viewer.setupEventHandlers
