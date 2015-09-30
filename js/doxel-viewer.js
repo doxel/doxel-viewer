@@ -102,7 +102,7 @@ $(document).ready(function(){
         viewer.init();
       },
       error: function(){
-        alert('could not load pointcloud metadata');
+        console.log('could not load pointcloud metadata');
       }
     });
 
@@ -230,7 +230,7 @@ var viewer={
 
             } else {
               console.log(arguments);
-              alert ('Error: could not load segment jpeg metadata table');
+              console.log ('Error: could not load segment jpeg metadata table');
               callback();
             }
 
@@ -238,7 +238,7 @@ var viewer={
 
           error: function() {
             console.log(arguments);
-            alert ('Error: server error - could not load segment jpeg metadata table');
+            console.log ('Error: server error - could not load segment jpeg metadata table');
             callback();
           }
 
@@ -266,13 +266,13 @@ var viewer={
             callback();
 
           } else {
-            alert ('Error: could not load segment jpeg metadata index');
+            console.log ('Error: could not load segment jpeg metadata index');
             callback();
           }
         },
 
         error: function() {
-            alert ('Error: server error: could not load segment jpeg metadata index');
+            console.log ('Error: server error: could not load segment jpeg metadata index');
             callback();
         }
 
@@ -350,7 +350,7 @@ var viewer={
 
           if (data.error) {
              console.log(data);
-             alert(data.error);
+             console.log(data.error);
              return;
           }
 
@@ -404,7 +404,7 @@ var viewer={
 
           } catch(e) {
             console.log(e);
-            alert(e.message);
+            //alert(e.message);
           }
 
           if (lon!==undefined && lat!==undefined) {
@@ -440,7 +440,7 @@ var viewer={
         loadImage(viewer.thumbs[thumbIndex].url,function complete(result){
           if (result.error) {
             console.log(result);
-            alert(error);
+            //alert(error);
 
           } else {
             // display thumbnail
@@ -451,7 +451,8 @@ var viewer={
               });
             } else {
               console.log(result);
-              alert('load error: '+viewer.thumbs[thumbIndex].url);
+              //alert('load error: '+viewer.thumbs[thumbIndex].url);
+              console.log('load error: '+viewer.thumbs[thumbIndex].url);
             }
 
           }
@@ -776,7 +777,7 @@ var frustums={
         dataType: 'text',
         success: callback,
         error: function() {
-          alert('Could not load '+frustums.url);
+          console.log('Could not load '+frustums.url);
         }
       });
 
