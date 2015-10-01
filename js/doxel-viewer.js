@@ -523,6 +523,14 @@ var viewer={
       var THREE=_window.THREE;
       var lookAt;
 
+      if (!camera) {
+        clearTimeout(viewer.showPoseTimeout);
+        viewer.showPoseTimeout=setTimeout(function(){
+          viewer.showPose(poseIndex,scrolling);
+        },150);
+        return;
+      }
+
       var pose0={
         index: Math.floor(poseIndex)
       }
