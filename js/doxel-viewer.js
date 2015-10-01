@@ -497,9 +497,18 @@ var viewer={
       // target pose index
       var pose=this.dataset.pose;
       if (pose!==undefined) {
-        viewer.showPose(pose);
 
+        frustums.mesh.visible=false;
+        viewer.goto({
+          position: viewer.data.extrinsics[pose].value.center,
+          rotation: viewer.data.extrinsics[pose].value.rotation,
+          steps: 10,
+          callback: function() {
+            viewer.showPose(pose);
+          }
+        });
       }
+
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -622,6 +631,164 @@ var viewer={
     }, // viewer_showPose
 
     /**
+    * @method viewer.goto
+    *
+    * Move and rotate the camera as specified
+    *
+    * @param {Array} [options.position]  destination position
+    * @param {Array} [options.rotation]  destination rotation
+    * @param {Number} [options.steps] number of steps
+    * @param {Function} [options.callback]
+    */
+    goto: function viewer_goto(options) {
+      var _window=$('iframe')[0].contentWindow;
+      var camera=_window.camera;
+      var THREE=_window.THREE;
+
+      var incr=1/options.steps;
+      var frac=0;
+
+      var position=[
+        [ camera.position.x, camera.position.y, camera.position.z ],
+        options.position
+      ];
+
+      var R=new THREE.Matrix4().makeRotationFromQuaternion(camera.quaternion);
+      var re=R.elements;
+      var rotation=[
+        [
+          [ re[0], re[1], re[2] ],
+          [ -re[4], -re[5], -re[6] ],
+          [ -re[8], -re[9], -re[10] ]
+        ],
+        options.rotation
+      ];
+
+      function moveCamera() {
+
+        frac+=incr;
+
+        if (frac>1) {
+          frac=1;
+
+        } else {
+          requestAnimationFrame(moveCamera)
+
+        }
+
+        viewer.moveCamera({
+          position: position,
+          rotation: rotation,
+          frac: frac,
+          callback: ((frac==1)?options.callback:undefined)
+        });
+
+      }
+
+      moveCamera();
+
+    }, // viewer.goto
+
+    /**
+    * @method viewer.moveCamera
+    *
+    * Move and rotate the camera to the specified position/rotation
+    *
+    * @param {Object} [options]
+    * @param {Array} [options.position]  source and destination positions
+    * @param {Array} [options.rotation]  source and destination rotations
+    * @param {Number} [options.frac] position along the path
+    * @param {Function} [options.callback]
+    *
+    */
+    moveCamera: function viewer_moveCamera(options){
+
+      var _window=$('iframe')[0].contentWindow;
+      var camera=_window.camera;
+      var THREE=_window.THREE;
+
+      if (!camera) {
+        clearTimeout(viewer.moveCameraTimeout);
+        viewer.moveCameraTimeout=setTimeout(function(){
+          viewer.moveCamera(options);
+        },150);
+        return;
+      }
+
+      var frac=options.frac;
+
+      /*
+      // get pose camera up vector
+      pose0.up=pose0.extrinsics.value.rotation[1];
+
+      // set camera position to extrinsic center
+      pose0.center=pose0.extrinsics.value.center;
+
+      // the camera lookAt vector is the third line of the camera rotation matrix
+      pose0.out=pose0.extrinsics.value.rotation[2];
+
+      // compute intermediate camera position/rotation
+
+          // get camera up vector for next frame
+          pose1.up=pose1.extrinsics.value.rotation[1];
+
+          */
+
+      var pose0={
+        center: options.position[0],
+        up: options.rotation[0][1],
+        out: options.rotation[0][2]
+      }
+
+      var pose1={
+        center: options.position[1],
+        up: options.rotation[1][1],
+        out: options.rotation[1][2]
+      }
+
+      // adjust scene camera up vector
+      camera.up.set(
+        -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+        -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+        -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+      );
+
+      // adjust camera lookAt vector
+      var lookAt=new THREE.Vector3(
+        pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
+        pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
+        pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
+      );
+
+      // adjust camera position
+      camera.position.set(
+        pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
+        pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
+        pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac
+      );
+
+      // translate lookAt vector to camera position
+      lookAt.x+=camera.position.x;
+      lookAt.y+=camera.position.y;
+      lookAt.z+=camera.position.z;
+
+      if (_window.controls.target) {
+        // copy the lookAt vector to orbit controls targets
+        _window.controls.target.copy(lookAt);
+        _window.controls.target0.copy(lookAt);
+
+      } else {
+        // set the camera lookAt vector
+        camera.lookAt(lookAt);
+      }
+
+      if (options.callback) {
+        options.callback();
+      }
+
+    }, // viewer_moveCamera
+
+    /**
     * @method viewer.scrollTo
     *
     * mCustomScrollbar immediate scrollto
@@ -687,6 +854,7 @@ var viewer={
       function showNextPose() {
 
         if (!viewer.mode.play) {
+          $(viewer).trigger('stop');
           return;
         }
 
@@ -702,7 +870,6 @@ var viewer={
           } else {
             // or stop
             viewer.mode.play=false;
-            $(viewer).trigger('stop');
           }
         }
       }
