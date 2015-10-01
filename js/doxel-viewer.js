@@ -308,7 +308,7 @@ var viewer={
       if (viewer.jpeg_table) {
         var start=viewer.jpeg_index[viewer.thumbs.current];
         var end=viewer.jpeg_index[viewer.thumbs.current+1];
-        var blob=viewer.jpeg_table.slice(start,end,'image/jpeg');
+        var blob=viewer.jpeg_table.slice(start,end||viewer.jpeg_table.size-1,'image/jpeg');
         viewer.parseMetadata(blob);
 
       } else {
