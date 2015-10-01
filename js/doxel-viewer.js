@@ -494,6 +494,10 @@ var viewer={
     */
     thumbnail_onclick: function viewer_thumbnail_onclick(e){
 
+      if (viewer.mode.play) {
+        return;
+      }
+
       // target pose index
       var pose=this.dataset.pose;
       if (pose!==undefined) {
@@ -645,6 +649,10 @@ var viewer={
       var camera=_window.camera;
       var THREE=_window.THREE;
 
+      if (viewer.mode.goto || viewer.mode.play) {
+        return;
+      }
+
       var incr=1/options.steps;
       var frac=0;
 
@@ -666,6 +674,10 @@ var viewer={
 
       function moveCamera() {
 
+        if (!viewer.mode.goto) {
+          return;
+        }
+
         frac+=incr;
 
         if (frac>1) {
@@ -680,11 +692,19 @@ var viewer={
           position: position,
           rotation: rotation,
           frac: frac,
-          callback: ((frac==1)?options.callback:undefined)
+          callback: function() {
+            if (frac==1) {
+              viewer.mode.goto=false;
+              if (options.callback) {
+                options.callback();
+              }
+            }
+          }
         });
 
       }
 
+      viewer.mode.goto=true;
       moveCamera();
 
     }, // viewer.goto
@@ -875,6 +895,7 @@ var viewer={
       }
 
       viewer.mode.play=true;
+      viewer.mode.goto=false;
       showNextPose();
 
     }, // viewer.play
