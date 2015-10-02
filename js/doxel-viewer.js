@@ -508,7 +508,9 @@ var viewer={
           rotation: viewer.data.extrinsics[pose].value.rotation,
           steps: 10,
           callback: function() {
-            viewer.showPose(pose);
+            viewer.showPose({
+              pose: pose
+            });
           }
         });
       }
@@ -526,15 +528,20 @@ var viewer={
     * If the pose specified is not an integer value, camera position and
     * rotation will be interpolated
     *
-    * @param {Number} [poseIndex] The pose to show, or an intermediate value.
+    * @param {Object} [options]
+    * @param {Number} [options.pose] The pose to show, or an intermediate value.
+    * @param {Boolean} [options.scrolling] Are we scrolling
     *
     */
-    showPose: function viewer_showPowse(poseIndex,scrolling){
+    showPose: function viewer_showPowse(options){
 
       var _window=$('iframe')[0].contentWindow;
       var camera=_window.camera;
       var THREE=_window.THREE;
       var lookAt;
+
+      var poseIndex=options.pose;
+      var scrolling=options.scrolling;
 
       if (!camera) {
         clearTimeout(viewer.showPoseTimeout);
@@ -553,84 +560,42 @@ var viewer={
       pose0.extrinsics=viewer.data.extrinsics[pose0.index];
       if (!pose0.extrinsics) return;
 
-      // get pose camera up vector
-      pose0.up=pose0.extrinsics.value.rotation[1];
-
-      // set camera position to extrinsic center
-      pose0.center=pose0.extrinsics.value.center;
-
-      // the camera lookAt vector is the third line of the camera rotation matrix
-      pose0.out=pose0.extrinsics.value.rotation[2];
-
       // compute intermediate camera position/rotation
       if (frac && pose0.index+1<viewer.data.extrinsics.length) {
+
         var pose1={
           index: pose0.index+1
         }
         pose1.extrinsics=viewer.data.extrinsics[pose1.index];
+
         if (pose1.extrinsics) {
 
-          // get camera up vector for next frame
-          pose1.up=pose1.extrinsics.value.rotation[1];
-
-          // adjust scene camera up vector
-          camera.up.set(
-            -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
-            -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
-            -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
-          );
-
-          // get camera lookAt vector for next frame
-          pose1.out=pose1.extrinsics.value.rotation[2];
-
-          // adjust camera lookAt vector
-          lookAt=new THREE.Vector3(
-            pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
-            pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
-            pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
-          );
-
-          // get next camera position
-          pose1.center=pose1.extrinsics.value.center;
-
-          // adjust camera position
-          camera.position.set(
-            pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
-            pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
-            pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac
-          );
+          viewer.moveCamera({
+            position: [
+              pose0.extrinsics.value.center,
+              pose1.extrinsics.value.center
+            ],
+            rotation: [
+              pose0.extrinsics.value.rotation,
+              pose1.extrinsics.value.rotation
+            ],
+            frac: frac,
+            callback: function(){
+              $(viewer).trigger('showpose',[poseIndex,scrolling]);
+            }
+          })
         }
 
       } else {
-        // set camera lookAt vector direction
-        lookAt=new THREE.Vector3(pose0.out[0],pose0.out[1],pose0.out[2]);
 
-        // set camera up vector
-        camera.up.set(-pose0.up[0],-pose0.up[1],-pose0.up[2]);
-
-        // set camera position
-        camera.position.x=pose0.center[0];
-        camera.position.y=pose0.center[1];
-        camera.position.z=pose0.center[2];
-
+        viewer.moveCamera({
+          position: pose0.extrinsics.value.center,
+          rotation: pose0.extrinsics.value.rotation,
+          callback: function(){
+            $(viewer).trigger('showpose',[poseIndex,scrolling]);
+          }
+        });
       }
-
-      // translate lookAt vector to camera position
-      lookAt.x+=camera.position.x;
-      lookAt.y+=camera.position.y;
-      lookAt.z+=camera.position.z;
-
-      if (_window.controls.target) {
-        // copy the lookAt vector to orbit controls targets
-        _window.controls.target.copy(lookAt);
-        _window.controls.target0.copy(lookAt);
-
-      } else {
-        // set the camera lookAt vector
-        camera.lookAt(lookAt);
-      }
-
-      $(viewer).trigger('showpose',[poseIndex,scrolling]);
 
     }, // viewer_showPose
 
@@ -735,57 +700,63 @@ var viewer={
         return;
       }
 
-      var frac=options.frac;
+      if (options.position.length==2) {
 
-      /*
-      // get pose camera up vector
-      pose0.up=pose0.extrinsics.value.rotation[1];
+        var frac=options.frac;
 
-      // set camera position to extrinsic center
-      pose0.center=pose0.extrinsics.value.center;
+        var pose0={
+          center: options.position[0],
+          up: options.rotation[0][1],
+          out: options.rotation[0][2]
+        }
 
-      // the camera lookAt vector is the third line of the camera rotation matrix
-      pose0.out=pose0.extrinsics.value.rotation[2];
+        var pose1={
+          center: options.position[1],
+          up: options.rotation[1][1],
+          out: options.rotation[1][2]
+        }
 
-      // compute intermediate camera position/rotation
+        // adjust scene camera up vector
+        camera.up.set(
+          -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+          -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+          -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+        );
 
-          // get camera up vector for next frame
-          pose1.up=pose1.extrinsics.value.rotation[1];
+        // adjust camera lookAt vector
+        var lookAt=new THREE.Vector3(
+          pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
+          pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
+          pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
+        );
 
-          */
+        // adjust camera position
+        camera.position.set(
+          pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
+          pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
+          pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac
+        );
 
-      var pose0={
-        center: options.position[0],
-        up: options.rotation[0][1],
-        out: options.rotation[0][2]
+      } else {
+
+        var pose0= {
+          center: options.position,
+          up: options.rotation[1],
+          out: options.rotation[2]
+        }
+
+        // set camera lookAt vector direction
+        lookAt=new THREE.Vector3(pose0.out[0],pose0.out[1],pose0.out[2]);
+
+        // set camera up vector
+        camera.up.set(-pose0.up[0],-pose0.up[1],-pose0.up[2]);
+
+        // set camera position
+        camera.position.x=pose0.center[0];
+        camera.position.y=pose0.center[1];
+        camera.position.z=pose0.center[2];
+
       }
-
-      var pose1={
-        center: options.position[1],
-        up: options.rotation[1][1],
-        out: options.rotation[1][2]
-      }
-
-      // adjust scene camera up vector
-      camera.up.set(
-        -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
-        -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
-        -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
-      );
-
-      // adjust camera lookAt vector
-      var lookAt=new THREE.Vector3(
-        pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
-        pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
-        pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
-      );
-
-      // adjust camera position
-      camera.position.set(
-        pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
-        pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
-        pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac
-      );
 
       // translate lookAt vector to camera position
       lookAt.x+=camera.position.x;
@@ -850,7 +821,9 @@ var viewer={
     marker_onclick: function viewer_marker_onclick(e){
       var marker=this;
       if (marker.options.pose) {
-        viewer.showPose(marker.options.pose);
+        viewer.showPose({
+          pose: marker.options.pose
+        });
       }
     }, // viewer.marker_onclick
 
@@ -860,7 +833,9 @@ var viewer={
     showFirstPose: function viewer_showFirstPose() {
       var a=$('#thumbnails a[data-pose]:first');
       if (a.length) {
-        viewer.showPose(a.data('pose'));
+        viewer.showPose({
+          pose: a.data('pose')
+        });
       }
     }, // viewer.showFirstPose
 
@@ -880,7 +855,9 @@ var viewer={
 
         requestAnimationFrame(showNextPose);
 
-        viewer.showPose(i+=0.1);
+        viewer.showPose({
+          pose: i+=0.1
+        });
 
         // on last frame
         if (i>=viewer.data.extrinsics.length) {
@@ -905,7 +882,10 @@ var viewer={
     */
     whileScrolling: function viewer_whileScrolling() {
       var poses=$('#thumbnails a[data-pose]');
-      viewer.showPose(poses.length*this.mcs.leftPct/100,true);
+      viewer.showPose({
+        pose: poses.length*this.mcs.leftPct/100,
+        scrolling: true
+      });
     }
 } // viewer
 
