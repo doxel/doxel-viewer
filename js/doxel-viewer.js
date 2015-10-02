@@ -89,7 +89,8 @@ $(document).ready(function(){
     $('iframe')
     .on('load',function(){
       // warning: load event could be fired only one time per iframe
-      frustums.init(this.contentWindow);
+      viewer.window=this.contentWindow;
+      frustums.init(viewer.window);
       viewer.showFirstPose();
     })
     .attr('src',viewer.segmentURL+'/potree');
@@ -481,10 +482,23 @@ var viewer={
 
         // on showpose
         $(viewer).on('showpose',function(e,pose,scrolling){
+
+          // store pose details for relative camera motion
+          viewer.pose={
+            index: pose,
+            position: viewer.getCameraPosition(),
+            rotation: viewer.getCameraRotation()
+          };
+
           pose=Math.floor(pose);
+
+          // show matching thumbnail
           if (!scrolling) viewer.scrollTo({pose: pose});
+
+          // outline matching thumbnail
           $('#thumbnails a.selected').removeClass('selected');
           $('#thumbnails a[data-pose='+pose+']').addClass('selected');
+
         });
 
     }, // viewer_setupEventHandlers
@@ -503,13 +517,21 @@ var viewer={
       if (pose!==undefined) {
 
         frustums.mesh.visible=false;
+
+        var relative={
+           position: viewer.getCameraRelativePosition(),
+           rotation: viewer.getCameraRelativeRotation()
+        };
+
         viewer.goto({
           position: viewer.data.extrinsics[pose].value.center,
           rotation: viewer.data.extrinsics[pose].value.rotation,
+          relative: relative,
           steps: 10,
           callback: function() {
             viewer.showPose({
-              pose: pose
+              pose: pose,
+              relative: relative
             });
           }
         });
@@ -535,13 +557,14 @@ var viewer={
     */
     showPose: function viewer_showPowse(options){
 
-      var _window=$('iframe')[0].contentWindow;
+      var _window=viewer.window;
       var camera=_window.camera;
       var THREE=_window.THREE;
       var lookAt;
 
       var poseIndex=options.pose;
       var scrolling=options.scrolling;
+      var relative=options.relative;
 
       if (!camera) {
         clearTimeout(viewer.showPoseTimeout);
@@ -579,6 +602,7 @@ var viewer={
               pose0.extrinsics.value.rotation,
               pose1.extrinsics.value.rotation
             ],
+            relative: options.relative,
             frac: frac,
             callback: function(){
               $(viewer).trigger('showpose',[poseIndex,scrolling]);
@@ -591,6 +615,7 @@ var viewer={
         viewer.moveCamera({
           position: pose0.extrinsics.value.center,
           rotation: pose0.extrinsics.value.rotation,
+          relative: options.relative,
           callback: function(){
             $(viewer).trigger('showpose',[poseIndex,scrolling]);
           }
@@ -600,17 +625,87 @@ var viewer={
     }, // viewer_showPose
 
     /**
+    * @method viewer.getCameraPosition
+    *
+    * @return {Array} position
+    */
+    getCameraPosition: function viewer_getCameraPosition(){
+      var pos=viewer.window.camera.position.elements;
+      return [
+        pos[0],
+        pos[1],
+        pos[2]
+      ];
+
+    }, // viewer.getCameraPosition
+
+    /**
+    * @method viewer.getCameraRotation
+    *
+    * @return {Array} rotation matrix
+    */
+    getCameraRotation: function viewer_getCameraRotation(){
+      var R=new THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
+      var re=R.elements;
+      return [
+          [ re[0], re[1], re[2] ],
+          [ -re[4], -re[5], -re[6] ],
+          [ -re[8], -re[9], -re[10] ]
+      ];
+
+    }, // viewer.getCameraRotation
+
+    /**
+    * @method viewer.getCameraRelativePosition
+    *
+    * Camera position relative to viewer.pose.position
+    *
+    * @return {Array} position
+    */
+    getCameraRelativePosition: function viewer_getCameraRelativePosition() {
+      var pos=viewer.window.camera.position.elements;
+      var pos0=viewer.pose.position;
+      return [
+        pos[0]-pos0[0],
+        pos[1]-pos0[1],
+        pos[2]-pos0[2]
+      ];
+
+    }, // viewer.getCameraRelativePosition
+
+    /**
+    * @method viewer.getCameraRotation
+    *
+    * Camera rotation relative to viewer.pose.rotation
+    *
+    * @return {Array} rotation matrix
+    */
+    getCameraRelativeRotation: function viewer_getCameraRelativeRotation(){
+      var R=new THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
+      var re=R.elements;
+      var re0=viewer.pose.rotation;
+      return [
+          [ re[0]-re0[0][0], re[1]-re[0][1], re[2]-re[0][2] ],
+          [ -re[4]-re0[1][0], -re[5]-re[1][1], -re[6]-re[1][2] ],
+          [ -re[8]-re0[2][0], -re[9]-re0[2][1], -re[10]-re0[2][2] ]
+      ];
+
+    }, // viewer.getCameraRotation
+
+
+    /**
     * @method viewer.goto
     *
     * Move and rotate the camera as specified
     *
     * @param {Array} [options.position]  destination position
     * @param {Array} [options.rotation]  destination rotation
+    * @param {Array} [options.relative]  optional relative position/rotation
     * @param {Number} [options.steps] number of steps
     * @param {Function} [options.callback]
     */
     goto: function viewer_goto(options) {
-      var _window=$('iframe')[0].contentWindow;
+      var _window=viewer.window;
       var camera=_window.camera;
       var THREE=_window.THREE;
 
@@ -622,18 +717,12 @@ var viewer={
       var frac=0;
 
       var position=[
-        [ camera.position.x, camera.position.y, camera.position.z ],
+        viewer.getCameraPosition(),
         options.position
       ];
 
-      var R=new THREE.Matrix4().makeRotationFromQuaternion(camera.quaternion);
-      var re=R.elements;
       var rotation=[
-        [
-          [ re[0], re[1], re[2] ],
-          [ -re[4], -re[5], -re[6] ],
-          [ -re[8], -re[9], -re[10] ]
-        ],
+        viewer.getCameraRotation(),
         options.rotation
       ];
 
@@ -656,6 +745,7 @@ var viewer={
         viewer.moveCamera({
           position: position,
           rotation: rotation,
+          relative: options.relative,
           frac: frac,
           callback: function() {
             if (frac==1) {
@@ -682,13 +772,14 @@ var viewer={
     * @param {Object} [options]
     * @param {Array} [options.position]  source and destination positions
     * @param {Array} [options.rotation]  source and destination rotations
+    * @param {Array} [options.relative]  optional relative rotation/translation
     * @param {Number} [options.frac] position along the path
     * @param {Function} [options.callback]
     *
     */
     moveCamera: function viewer_moveCamera(options){
 
-      var _window=$('iframe')[0].contentWindow;
+      var _window=viewer.window;
       var camera=_window.camera;
       var THREE=_window.THREE;
 
@@ -700,6 +791,21 @@ var viewer={
         return;
       }
 
+      var relative=options.relative||{
+        position: [0,0,0],
+        rotation: [
+          [0,0,0],
+          [0,0,0],
+          [0,0,0]
+        ];
+      };
+
+      var rel={
+        center: relative.position,
+        up: relative.rotation[1],
+        out: relative.rotation[2]
+      };
+
       if (options.position.length==2) {
 
         var frac=options.frac;
@@ -708,33 +814,33 @@ var viewer={
           center: options.position[0],
           up: options.rotation[0][1],
           out: options.rotation[0][2]
-        }
+        };
 
         var pose1={
           center: options.position[1],
           up: options.rotation[1][1],
           out: options.rotation[1][2]
-        }
+        };
 
         // adjust scene camera up vector
         camera.up.set(
-          -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
-          -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
-          -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+          -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac+rel.up[0]),
+          -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac+rel.up[1]),
+          -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac+rel.up[2])
         );
 
         // adjust camera lookAt vector
         var lookAt=new THREE.Vector3(
-          pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
-          pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
-          pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
+          pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac+rel.out[0],
+          pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac+rel.out[1],
+          pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac+rel.out[2]
         );
 
         // adjust camera position
         camera.position.set(
-          pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
-          pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
-          pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac
+          pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac+rel.center[0],
+          pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac+rel.center[1],
+          pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac+rel.center[2]
         );
 
       } else {
@@ -743,18 +849,26 @@ var viewer={
           center: options.position,
           up: options.rotation[1],
           out: options.rotation[2]
-        }
+        };
 
         // set camera lookAt vector direction
-        lookAt=new THREE.Vector3(pose0.out[0],pose0.out[1],pose0.out[2]);
+        lookAt=new THREE.Vector3(
+          pose0.out[0]+rel.out[0],
+          pose0.out[1]+rel.out[1],
+          pose0.out[2]+rel.out[2]
+        );
 
         // set camera up vector
-        camera.up.set(-pose0.up[0],-pose0.up[1],-pose0.up[2]);
+        camera.up.set(
+          -(pose0.up[0]+rel.up[0]),
+          -(pose0.up[1]+rel.up[1]),
+          -(pose0.up[2]+rel.up[2])
+        );
 
         // set camera position
-        camera.position.x=pose0.center[0];
-        camera.position.y=pose0.center[1];
-        camera.position.z=pose0.center[2];
+        camera.position.x=pose0.center[0]+rel.center[0];
+        camera.position.y=pose0.center[1]+rel.center[1];
+        camera.position.z=pose0.center[2]+rel.center[2];
 
       }
 
