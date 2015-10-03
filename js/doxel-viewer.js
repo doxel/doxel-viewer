@@ -132,6 +132,14 @@ var viewer={
     posesOnly: true,
 
     /**
+    * @property viewer.pose
+    *
+    * last pose displayed
+    *
+    */
+    pose: 0,
+
+    /**
     * @property viewer.mode
     */
     mode: {},
@@ -484,11 +492,8 @@ var viewer={
         $(viewer).on('showpose',function(e,pose,scrolling){
 
           // store pose details for relative camera motion
-          viewer.pose={
-            index: pose,
-            position: viewer.getCameraPosition(),
-            rotation: viewer.getCameraRotation()
-          };
+          viewer.pose=pose;
+          console.log('showpose',viewer.pose);
 
           pose=Math.floor(pose);
 
@@ -515,26 +520,9 @@ var viewer={
       // target pose index
       var pose=this.dataset.pose;
       if (pose!==undefined) {
-
         frustums.mesh.visible=false;
+        viewer.showPose(pose);
 
-        var relative={
-           position: viewer.getCameraRelativePosition(),
-           rotation: viewer.getCameraRelativeRotation()
-        };
-
-        viewer.goto({
-          position: viewer.data.extrinsics[pose].value.center,
-          rotation: viewer.data.extrinsics[pose].value.rotation,
-          relative: relative,
-          steps: 10,
-          callback: function() {
-            viewer.showPose({
-              pose: pose,
-              relative: relative
-            });
-          }
-        });
       }
 
       e.preventDefault();
@@ -557,72 +545,131 @@ var viewer={
     */
     showPose: function viewer_showPowse(options){
 
+      if (!(options instanceof Object)) {
+        options={pose: options};
+      }
+
       var _window=viewer.window;
-      var camera=_window.camera;
-      var THREE=_window.THREE;
-      var lookAt;
-
-      var poseIndex=options.pose;
-      var scrolling=options.scrolling;
-      var relative=options.relative;
-
-      if (!camera) {
+      if (!_window) {
         clearTimeout(viewer.showPoseTimeout);
         viewer.showPoseTimeout=setTimeout(function(){
-          viewer.showPose(poseIndex,scrolling);
+          viewer.showPose(options);
         },150);
         return;
       }
 
-      var pose0={
-        index: Math.floor(poseIndex)
+      var camera=_window.camera;
+
+      var poseIndex=options.pose;
+      var scrolling=options.scrolling;
+
+      if (!camera) {
+        clearTimeout(viewer.showPoseTimeout);
+        viewer.showPoseTimeout=setTimeout(function(){
+          viewer.showPose(options);
+        },150);
+        return;
       }
-      var frac=poseIndex-pose0.index;
+
+      var pose=viewer.getPoseExtrinsics(poseIndex);
+
+      var rel=viewer.getRelativeCameraExtrinsics();
+
+      var dest={
+        t: pose.position,
+        R: pose.rotation
+      }
+
+      viewer.goto({
+        position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
+        rotation: [
+          [dest.R[0][0]+rel.R[0][0],dest.R[0][1]+rel.R[0][1],dest.R[0][2]+rel.R[0][2]],
+          [dest.R[1][0]+rel.R[1][0],dest.R[1][1]+rel.R[1][1],dest.R[1][2]+rel.R[1][2]],
+          [dest.R[2][0]+rel.R[2][0],dest.R[2][1]+rel.R[2][1],dest.R[2][2]+rel.R[2][2]]
+        ],
+        steps: options.steps||10,
+        callback: function() {
+          $(viewer).trigger('showpose',[poseIndex]);
+        }
+      });
+
+    }, // viewer_showPose
+
+    /**
+    * @method viewer.getPoseExtrinsics
+    *
+    * @param {Number} [pose] the pose number
+    * @return {Object} [extrinsics]
+    * @return {Array} [extrinsics.position]
+    * @return {Array} [extrinsics.rotation]
+    */
+    getPoseExtrinsics: function viewer_getPoseExtrinsics(pose){
+      var pose0={
+        index: Math.floor(pose)
+      };
+      var frac=pose-pose0.index;
 
       // get pose extrinsics
-      pose0.extrinsics=viewer.data.extrinsics[pose0.index];
-      if (!pose0.extrinsics) return;
-
-      // compute intermediate camera position/rotation
+      if (viewer.data.extrinsics.length<=pose0.index) return;
+      console.log('index',pose0.index);
+      pose0.extrinsics=viewer.data.extrinsics[pose0.index].value;
+      
       if (frac && pose0.index+1<viewer.data.extrinsics.length) {
-
+        // interpolate inter-pose camera position/rotation
         var pose1={
           index: pose0.index+1
         }
-        pose1.extrinsics=viewer.data.extrinsics[pose1.index];
+        pose1.extrinsics=viewer.data.extrinsics[pose1.index].value;
+        pose1.center=pose1.extrinsics.center;
+        pose1.right=pose1.extrinsics.rotation[0];
+        pose1.up=pose1.extrinsics.rotation[1];
+        pose1.out=pose1.extrinsics.rotation[2];
 
-        if (pose1.extrinsics) {
+        pose0.center=pose0.extrinsics.center;
+        pose0.right=pose0.extrinsics.rotation[0];
+        pose0.up=pose0.extrinsics.rotation[1];
+        pose0.out=pose0.extrinsics.rotation[2];
 
-          viewer.moveCamera({
-            position: [
-              pose0.extrinsics.value.center,
-              pose1.extrinsics.value.center
+        return {
+          position: [
+            pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
+            pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
+            pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac,
+          ],
+          rotation: [
+            [
+              pose0.right[0]+(pose1.right[0]-pose0.right[0])*frac,
+              pose0.right[1]+(pose1.right[1]-pose0.right[1])*frac,
+              pose0.right[2]+(pose1.right[2]-pose0.right[2])*frac
             ],
-            rotation: [
-              pose0.extrinsics.value.rotation,
-              pose1.extrinsics.value.rotation
+            [
+              -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+              -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+              -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
             ],
-            relative: options.relative,
-            frac: frac,
-            callback: function(){
-              $(viewer).trigger('showpose',[poseIndex,scrolling]);
-            }
-          })
+            [
+              pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
+              pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
+              pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
+            ]
+          ]
+
         }
 
-      } else {
-
-        viewer.moveCamera({
-          position: pose0.extrinsics.value.center,
-          rotation: pose0.extrinsics.value.rotation,
-          relative: options.relative,
-          callback: function(){
-            $(viewer).trigger('showpose',[poseIndex,scrolling]);
-          }
-        });
       }
 
-    }, // viewer_showPose
+      pose0.up=pose0.extrinsics.rotation[1];
+
+      return {
+        position: pose0.extrinsics.center,
+        rotation: [
+          pose0.extrinsics.rotation[0],
+          [ -pose0.up[0], -pose0.up[1], -pose0.up[2] ],
+          pose0.extrinsics.rotation[2]
+        ]
+      }
+
+    }, // viewer.getPoseExtrinsics
 
     /**
     * @method viewer.getCameraPosition
@@ -630,11 +677,11 @@ var viewer={
     * @return {Array} position
     */
     getCameraPosition: function viewer_getCameraPosition(){
-      var pos=viewer.window.camera.position.elements;
+      var pos=viewer.window.camera.position;
       return [
-        pos[0],
-        pos[1],
-        pos[2]
+        pos.x,
+        pos.y,
+        pos.z
       ];
 
     }, // viewer.getCameraPosition
@@ -645,7 +692,7 @@ var viewer={
     * @return {Array} rotation matrix
     */
     getCameraRotation: function viewer_getCameraRotation(){
-      var R=new THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
+      var R=new viewer.window.THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
       var re=R.elements;
       return [
           [ re[0], re[1], re[2] ],
@@ -656,42 +703,39 @@ var viewer={
     }, // viewer.getCameraRotation
 
     /**
-    * @method viewer.getCameraRelativePosition
+    * @method viewer.getRelativeCameraExtrinsics
     *
-    * Camera position relative to viewer.pose.position
+    * Camera position and rotation relative to viewer.pose
     *
     * @return {Array} position
     */
-    getCameraRelativePosition: function viewer_getCameraRelativePosition() {
-      var pos=viewer.window.camera.position.elements;
-      var pos0=viewer.pose.position;
-      return [
-        pos[0]-pos0[0],
-        pos[1]-pos0[1],
-        pos[2]-pos0[2]
-      ];
+    getRelativeCameraExtrinsics: function viewer_getRelativeCameraExtrinsics() {
 
-    }, // viewer.getCameraRelativePosition
+      // camera extrinsics
+      var R=new viewer.window.THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
+      var Rc=R.elements;
+      var pc=viewer.window.camera.position;
 
-    /**
-    * @method viewer.getCameraRotation
-    *
-    * Camera rotation relative to viewer.pose.rotation
-    *
-    * @return {Array} rotation matrix
-    */
-    getCameraRelativeRotation: function viewer_getCameraRelativeRotation(){
-      var R=new THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
-      var re=R.elements;
-      var re0=viewer.pose.rotation;
-      return [
-          [ re[0]-re0[0][0], re[1]-re[0][1], re[2]-re[0][2] ],
-          [ -re[4]-re0[1][0], -re[5]-re[1][1], -re[6]-re[1][2] ],
-          [ -re[8]-re0[2][0], -re[9]-re0[2][1], -re[10]-re0[2][2] ]
-      ];
+      // pose extrinsics
+      var extrinsics=viewer.getPoseExtrinsics(viewer.pose);
+      var Rp=extrinsics.rotation;
+      var pp=extrinsics.position;
 
-    }, // viewer.getCameraRotation
+      // camera position and rotation relative to viewer.pose
+      return {
+        t: [
+          pc.x-pp[0],
+          pc.y-pp[1],
+          pc.z-pp[2]
+        ],
+        R: [
+          [ Rc[0]-Rp[0][0], Rc[1]-Rp[0][1], Rc[2]-Rp[0][2] ],
+          [ -Rc[4]-Rp[1][0], -Rc[5]-Rp[1][1], -Rc[6]-Rp[1][2] ],
+          [ Rc[8]-Rp[2][0], Rc[9]-Rp[2][1], Rc[10]-Rp[2][2] ]
+        ]
+      };
 
+    }, // viewer.getRelativeCameraExtrinsics
 
     /**
     * @method viewer.goto
@@ -700,7 +744,6 @@ var viewer={
     *
     * @param {Array} [options.position]  destination position
     * @param {Array} [options.rotation]  destination rotation
-    * @param {Array} [options.relative]  optional relative position/rotation
     * @param {Number} [options.steps] number of steps
     * @param {Function} [options.callback]
     */
@@ -709,7 +752,7 @@ var viewer={
       var camera=_window.camera;
       var THREE=_window.THREE;
 
-      if (viewer.mode.goto || viewer.mode.play) {
+      if (viewer.mode.goto) {
         return;
       }
 
@@ -745,7 +788,6 @@ var viewer={
         viewer.moveCamera({
           position: position,
           rotation: rotation,
-          relative: options.relative,
           frac: frac,
           callback: function() {
             if (frac==1) {
@@ -772,7 +814,6 @@ var viewer={
     * @param {Object} [options]
     * @param {Array} [options.position]  source and destination positions
     * @param {Array} [options.rotation]  source and destination rotations
-    * @param {Array} [options.relative]  optional relative rotation/translation
     * @param {Number} [options.frac] position along the path
     * @param {Function} [options.callback]
     *
@@ -790,21 +831,6 @@ var viewer={
         },150);
         return;
       }
-
-      var relative=options.relative||{
-        position: [0,0,0],
-        rotation: [
-          [0,0,0],
-          [0,0,0],
-          [0,0,0]
-        ]
-      };
-
-      var rel={
-        center: relative.position,
-        up: relative.rotation[1],
-        out: relative.rotation[2]
-      };
 
       if (options.position.length==2) {
 
@@ -824,23 +850,23 @@ var viewer={
 
         // adjust scene camera up vector
         camera.up.set(
-          -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac+rel.up[0]),
-          -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac+rel.up[1]),
-          -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac+rel.up[2])
+          -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+          -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+          -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
         );
 
         // adjust camera lookAt vector
         var lookAt=new THREE.Vector3(
-          pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac+rel.out[0],
-          pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac+rel.out[1],
-          pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac+rel.out[2]
+          pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac[0],
+          pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac[1],
+          pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac[2]
         );
 
         // adjust camera position
         camera.position.set(
-          pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac+rel.center[0],
-          pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac+rel.center[1],
-          pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac+rel.center[2]
+          pose0.center[0]+(pose1.center[0]-pose0.center[0])*frac,
+          pose0.center[1]+(pose1.center[1]-pose0.center[1])*frac,
+          pose0.center[2]+(pose1.center[2]-pose0.center[2])*frac
         );
 
       } else {
@@ -853,22 +879,22 @@ var viewer={
 
         // set camera lookAt vector direction
         lookAt=new THREE.Vector3(
-          pose0.out[0]+rel.out[0],
-          pose0.out[1]+rel.out[1],
-          pose0.out[2]+rel.out[2]
+          pose0.out[0],
+          pose0.out[1],
+          pose0.out[2]
         );
 
         // set camera up vector
         camera.up.set(
-          -(pose0.up[0]+rel.up[0]),
-          -(pose0.up[1]+rel.up[1]),
-          -(pose0.up[2]+rel.up[2])
+          (pose0.up[0]),
+          (pose0.up[1]),
+          (pose0.up[2])
         );
 
         // set camera position
-        camera.position.x=pose0.center[0]+rel.center[0];
-        camera.position.y=pose0.center[1]+rel.center[1];
-        camera.position.z=pose0.center[2]+rel.center[2];
+        camera.position.x=pose0.center[0];
+        camera.position.y=pose0.center[1];
+        camera.position.z=pose0.center[2];
 
       }
 
@@ -969,12 +995,17 @@ var viewer={
 
         requestAnimationFrame(showNextPose);
 
-        viewer.showPose({
-          pose: i+=0.1
-        });
+        i+=0.1;
+
+        if (i+1>viewer.data.extrinsics.length) {
+          i=viewer.data.extrinsics.length-1;
+        }
+
+        viewer.moveCamera(viewer.getPoseExtrinsics(i.toFixed(1)));
+        $(viewer).trigger('showpose',[i]);
 
         // on last frame
-        if (i>=viewer.data.extrinsics.length) {
+        if (i+1==viewer.data.extrinsics.length) {
           // loop
           if (viewer.mode.loop) {
             i=0;
