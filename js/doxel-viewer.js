@@ -229,7 +229,17 @@ var viewer={
           url: viewer.segmentURL+'/jpeg_metadata.bin',
           dataType: 'native',
           xhrFields: {
-            responseType: 'blob'
+            responseType: 'blob',
+            onprogress: function(e){
+              viewer.jpeg_table=e.response;
+              if (e.total>viewer.jpeg_index[(viewer.thumbs.current||0)+1]) {
+                if (!viewer.thumbs.progressEvent) {
+                  console.log('loadThumbnails');
+                  viewer.thumbs.progressEvent=e;
+                  viewer.loadThumbnails();
+                }
+              }
+            }
           },
 
           success: function(blob) {
@@ -316,9 +326,14 @@ var viewer={
 
       if (viewer.jpeg_table) {
         var start=viewer.jpeg_index[viewer.thumbs.current];
-        var end=viewer.jpeg_index[viewer.thumbs.current+1];
-        var blob=viewer.jpeg_table.slice(start,end||viewer.jpeg_table.size-1,'image/jpeg');
-        viewer.parseMetadata(blob);
+        var end=viewer.jpeg_index[viewer.thumbs.current+1]||(viewer.jpeg_table.size-1);
+        if (!viewer.thumbs.progressEvent || (viewer.thumbs.progressEvent && viewer.thumbs.progressEvent.loaded>=end)) {
+          var blob=viewer.jpeg_table.slice(start,end,'image/jpeg');
+          viewer.parseMetadata(blob);
+        } else {
+          --viewer.thumbs.current;
+          viewer.thumbs.progressEvent=null;
+        }
 
       } else {
         // fallback to load jpeg headers one per one
@@ -493,7 +508,6 @@ var viewer={
 
           // store pose details for relative camera motion
           viewer.pose=pose;
-          console.log('showpose',viewer.pose);
 
           pose=Math.floor(pose);
 
@@ -574,6 +588,10 @@ var viewer={
       var pose=viewer.getPoseExtrinsics(poseIndex);
 
       var rel=viewer.getRelativeCameraExtrinsics();
+      var rel={
+        R: [[0,0,0],[0,0,0],[0,0,0]],
+        t: [0,0,0]
+      }
 
       var dest={
         t: pose.position,
@@ -611,7 +629,6 @@ var viewer={
 
       // get pose extrinsics
       if (viewer.data.extrinsics.length<=pose0.index) return;
-      console.log('index',pose0.index);
       pose0.extrinsics=viewer.data.extrinsics[pose0.index].value;
       
       if (frac && pose0.index+1<viewer.data.extrinsics.length) {
@@ -696,7 +713,7 @@ var viewer={
       var re=R.elements;
       return [
           [ re[0], re[1], re[2] ],
-          [ -re[4], -re[5], -re[6] ],
+          [ re[4], re[5], re[6] ],
           [ -re[8], -re[9], -re[10] ]
       ];
 
@@ -730,8 +747,8 @@ var viewer={
         ],
         R: [
           [ Rc[0]-Rp[0][0], Rc[1]-Rp[0][1], Rc[2]-Rp[0][2] ],
-          [ -Rc[4]-Rp[1][0], -Rc[5]-Rp[1][1], -Rc[6]-Rp[1][2] ],
-          [ Rc[8]-Rp[2][0], Rc[9]-Rp[2][1], Rc[10]-Rp[2][2] ]
+          [ Rc[4]-Rp[1][0], Rc[5]-Rp[1][1], Rc[6]-Rp[1][2] ],
+          [ Rc[8]+Rp[2][0], Rc[9]+Rp[2][1], Rc[10]+Rp[2][2] ]
         ]
       };
 
@@ -812,11 +829,10 @@ var viewer={
     * Move and rotate the camera to the specified position/rotation
     *
     * @param {Object} [options]
-    * @param {Array} [options.position]  source and destination positions
-    * @param {Array} [options.rotation]  source and destination rotations
-    * @param {Number} [options.frac] position along the path
+    * @param {Array} [options.position]  source (optional) and destination positions
+    * @param {Array} [options.rotation]  source (optional) and destination rotations
+    * @param {Number} [options.frac] position along the path, when source Rt specified
     * @param {Function} [options.callback]
-    *
     */
     moveCamera: function viewer_moveCamera(options){
 
@@ -850,16 +866,16 @@ var viewer={
 
         // adjust scene camera up vector
         camera.up.set(
-          -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
-          -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
-          -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+          pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac,
+          pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac,
+          pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac
         );
 
         // adjust camera lookAt vector
         var lookAt=new THREE.Vector3(
-          pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac[0],
-          pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac[1],
-          pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac[2]
+          pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
+          pose0.out[1]+(pose1.out[1]-pose0.out[1])*frac,
+          pose0.out[2]+(pose1.out[2]-pose0.out[2])*frac
         );
 
         // adjust camera position
@@ -886,9 +902,9 @@ var viewer={
 
         // set camera up vector
         camera.up.set(
-          (pose0.up[0]),
-          (pose0.up[1]),
-          (pose0.up[2])
+          pose0.up[0],
+          pose0.up[1],
+          pose0.up[2]
         );
 
         // set camera position
@@ -1026,11 +1042,9 @@ var viewer={
     * @method viewer.whileScrolling
     */
     whileScrolling: function viewer_whileScrolling() {
-      var poses=$('#thumbnails a[data-pose]');
-      viewer.showPose({
-        pose: poses.length*this.mcs.leftPct/100,
-        scrolling: true
-      });
+      var pose=viewer.data.extrinsics.length*this.mcs.leftPct/100;
+      viewer.moveCamera(viewer.getPoseExtrinsics(pose));
+      $(viewer).trigger('showpose', [pose,true]);
     }
 } // viewer
 
