@@ -590,14 +590,34 @@ var viewer={
 
       var pose=viewer.getPoseExtrinsics(poseIndex);
 
-      // cancel relative position/rotation on second click
+      // toggle relative position/rotation
       var rel;
-      if (poseIndex!=viewer.pose) { 
-        rel=viewer.rel=viewer.getRelativeCameraExtrinsics();
+      var _rel=viewer.getRelativeCameraExtrinsics();
+      var relativeExtrinsicsNotNull= !viewer.rel || viewer.rel && (
+        Math.abs(_rel.t[0]-viewer.rel.t[0])>1e-6 ||
+        Math.abs(_rel.t[1]-viewer.rel.t[1])>1e-6 ||
+        Math.abs(_rel.t[2]-viewer.rel.t[2])>1e-6 ||
+        Math.abs(_rel.R[0][0]-viewer.rel.R[0][0])>1e-6 ||
+        Math.abs(_rel.R[0][1]-viewer.rel.R[0][1])>1e-6 ||
+        Math.abs(_rel.R[0][2]-viewer.rel.R[0][2])>1e-6 ||
+        Math.abs(_rel.R[1][0]-viewer.rel.R[1][0])>1e-6 ||
+        Math.abs(_rel.R[1][1]-viewer.rel.R[1][1])>1e-6 ||
+        Math.abs(_rel.R[1][2]-viewer.rel.R[1][2])>1e-6 ||
+        Math.abs(_rel.R[2][0]-viewer.rel.R[2][0])>1e-6 ||
+        Math.abs(_rel.R[2][1]-viewer.rel.R[2][1])>1e-6 ||
+        Math.abs(_rel.R[2][2]-viewer.rel.R[2][2])>1e-6
+      );
+
+      if (!viewer.rel && relativeExtrinsicsNotNull) {
+        rel=viewer.rel=_rel;
         viewer.rel_active=true;
 
       } else {
-       if (!viewer.rel || viewer.rel_active) {
+       if (relativeExtrinsicsNotNull && viewer.rel_active) {
+         viewer.rel=_rel;
+       }
+
+       if (!viewer.rel || (!viewer.rel_active && options.pose!=viewer.pose) || (viewer.rel_active && options.pose==viewer.pose)) {
           rel={
             t: [0,0,0],
             R: [ [0,0,0], [0,0,0], [0,0,0] ]
