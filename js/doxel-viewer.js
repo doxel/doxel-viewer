@@ -231,8 +231,8 @@ var viewer={
           xhrFields: {
             responseType: 'blob',
             onprogress: function(e){
-              viewer.jpeg_table=e.response;
-              if (e.total>viewer.jpeg_index[(viewer.thumbs.current||0)+1]) {
+              viewer.jpeg_table=e.target.response;
+              if (e.target.response && e.loaded>viewer.jpeg_index[(viewer.thumbs.current||0)+1]) {
                 if (!viewer.thumbs.progressEvent) {
                   console.log('loadThumbnails');
                   viewer.thumbs.progressEvent=e;
@@ -564,26 +564,18 @@ var viewer={
       }
 
       var _window=viewer.window;
-      if (!_window) {
+
+      if (!_window || !_window.camera) {
         clearTimeout(viewer.showPoseTimeout);
         viewer.showPoseTimeout=setTimeout(function(){
           viewer.showPose(options);
         },150);
         return;
       }
-
       var camera=_window.camera;
 
       var poseIndex=options.pose;
       var scrolling=options.scrolling;
-
-      if (!camera) {
-        clearTimeout(viewer.showPoseTimeout);
-        viewer.showPoseTimeout=setTimeout(function(){
-          viewer.showPose(options);
-        },150);
-        return;
-      }
 
       var pose=viewer.getPoseExtrinsics(poseIndex);
 
@@ -766,6 +758,15 @@ var viewer={
     */
     goto: function viewer_goto(options) {
       var _window=viewer.window;
+
+      if (!_window || !_window.camera) {
+        clearTimeout(viewer.gotoTimeout);
+        viewer.gotoTimeout=setTimeout(function(){
+          viewer.goto(options);
+        },150);
+        return;
+      }
+
       var camera=_window.camera;
       var THREE=_window.THREE;
 
@@ -837,16 +838,17 @@ var viewer={
     moveCamera: function viewer_moveCamera(options){
 
       var _window=viewer.window;
-      var camera=_window.camera;
-      var THREE=_window.THREE;
 
-      if (!camera) {
+      if (!_window || !_window.camera) {
         clearTimeout(viewer.moveCameraTimeout);
         viewer.moveCameraTimeout=setTimeout(function(){
           viewer.moveCamera(options);
         },150);
         return;
       }
+
+      var camera=_window.camera;
+      var THREE=_window.THREE;
 
       if (options.position.length==2) {
 
@@ -1001,6 +1003,15 @@ var viewer={
     play: function viewer_play() {
       var i=0;
       var incr;
+      var _window=viewer.window;
+
+      if (!_window || !_window.camera) {
+        clearTimeout(viewer.playTimeout);
+        viewer.playTimeout=setTimeout(function(){
+          viewer.play();
+        },150);
+        return;
+      }
 
       function showNextPose() {
 
