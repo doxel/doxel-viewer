@@ -118,7 +118,6 @@ $(document).ready(function(){
 * @object viewer
 */
 var viewer={
-
     /**
     * @property viewer.metadata_size
     *
@@ -318,8 +317,9 @@ var viewer={
 
         // stop on last thumb
         if (viewer.thumbs.current>=viewer.thumbs.length) {
-          viewer.thumbs.current=undefined;
-          $('#thumbnails').trigger('load');
+          if (viewer.thumbs.current==viewer.thumbs.length) {
+            $('#thumbnails').trigger('load');
+          }
           return;
         }
       }
@@ -338,6 +338,16 @@ var viewer={
       } else {
         // fallback to load jpeg headers one per one
         // (TODO: use a web worker)
+
+        if (viewer.jpeg_index) {
+          var start=viewer.jpeg_index[viewer.thumbs.current];
+          var end=viewer.jpeg_index[viewer.thumbs.current+1];
+          var length=end-start;
+          if (!isNaN(length)) {
+            viewer.thumbs[viewer.thumbs.current].metadata_size=length;
+          }
+        }
+
         $.ajax({
           dataType: 'native',
           url: viewer.thumbs[viewer.thumbs.current].url,
@@ -555,6 +565,7 @@ var viewer={
     * @param {Object} [options]
     * @param {Number} [options.pose] The pose to show, or an intermediate value.
     * @param {Boolean} [options.scrolling] Are we scrolling
+    * @param {Function} [options.callback] callback
     *
     */
     showPose: function viewer_showPowse(options){
@@ -579,16 +590,23 @@ var viewer={
 
       var pose=viewer.getPoseExtrinsics(poseIndex);
 
-      var rel=viewer.getRelativeCameraExtrinsics();
-      var rel={
-        R: [[0,0,0],[0,0,0],[0,0,0]],
-        t: [0,0,0]
+      // cancel relative position/rotation on second click
+      if (poseIndex!=viewer.pose) { 
+        var rel=viewer.getRelativeCameraExtrinsics();
+
+      } else {
+        var rel={
+          t: [0,0,0],
+          R: [ [0,0,0], [0,0,0], [0,0,0] ]
+        }
       }
 
       var dest={
         t: pose.position,
         R: pose.rotation
       }
+
+      viewer.prevPose=poseIndex;
 
       viewer.goto({
         position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
@@ -600,6 +618,9 @@ var viewer={
         steps: options.steps||10,
         callback: function() {
           $(viewer).trigger('showpose',[poseIndex]);
+          if (options.callback) {
+            options.callback();
+          }
         }
       });
 
@@ -721,8 +742,7 @@ var viewer={
     getRelativeCameraExtrinsics: function viewer_getRelativeCameraExtrinsics() {
 
       // camera extrinsics
-      var R=new viewer.window.THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
-      var Rc=R.elements;
+      var Rc=viewer.getCameraRotation();
       var pc=viewer.window.camera.position;
 
       // pose extrinsics
@@ -738,9 +758,9 @@ var viewer={
           pc.z-pp[2]
         ],
         R: [
-          [ Rc[0]-Rp[0][0], Rc[1]-Rp[0][1], Rc[2]-Rp[0][2] ],
-          [ Rc[4]-Rp[1][0], Rc[5]-Rp[1][1], Rc[6]-Rp[1][2] ],
-          [ Rc[8]+Rp[2][0], Rc[9]+Rp[2][1], Rc[10]+Rp[2][2] ]
+          [ Rc[0][0]-Rp[0][0], Rc[0][0]-Rp[0][1], Rc[0][2]-Rp[0][2] ],
+          [ Rc[1][0]-Rp[1][0], Rc[1][1]-Rp[1][1], Rc[1][2]-Rp[1][2] ],
+          [ Rc[2][0]-Rp[2][0], Rc[2][1]-Rp[2][1], Rc[2][2]-Rp[2][2] ]
         ]
       };
 
@@ -924,7 +944,6 @@ var viewer={
       if (_window.controls.target) {
         // copy the lookAt vector to orbit controls targets
         _window.controls.target.copy(lookAt);
-        _window.controls.target0.copy(lookAt);
 
       } else {
         // set the camera lookAt vector
@@ -992,7 +1011,15 @@ var viewer={
       var a=$('#thumbnails a[data-pose]:first');
       if (a.length) {
         viewer.showPose({
-          pose: a.data('pose')
+          pose: a.data('pose'),
+          callback: function() {
+            if (viewer.window.controls.target0) {
+              viewer.window.controls.target0.copy(viewer.window.controls.target);
+            }
+            if (viewer.window.controls.position) {
+              viewer.window.controls.position.copy(viewer.window.camera.position);
+            }
+          }
         });
       }
     }, // viewer.showFirstPose
@@ -1053,8 +1080,19 @@ var viewer={
     * @method viewer.whileScrolling
     */
     whileScrolling: function viewer_whileScrolling() {
-      var pose=viewer.data.extrinsics.length*this.mcs.leftPct/100;
-      viewer.moveCamera(viewer.getPoseExtrinsics(pose));
+      var pose=(viewer.data.extrinsics.length-1)*this.mcs.leftPct/100;
+      var dest=viewer.getPoseExtrinsics(pose);
+      dest.t=dest.position;
+      dest.R=dest.rotation;
+      var rel=viewer.getRelativeCameraExtrinsics();
+      viewer.moveCamera({
+        position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
+        rotation: [
+          [dest.R[0][0]+rel.R[0][0],dest.R[0][1]+rel.R[0][1],dest.R[0][2]+rel.R[0][2]],
+          [dest.R[1][0]+rel.R[1][0],dest.R[1][1]+rel.R[1][1],dest.R[1][2]+rel.R[1][2]],
+          [dest.R[2][0]+rel.R[2][0],dest.R[2][1]+rel.R[2][1],dest.R[2][2]+rel.R[2][2]]
+        ]
+      });
       $(viewer).trigger('showpose', [pose,true]);
     }
 } // viewer
@@ -1106,6 +1144,7 @@ var frustums={
           frustums.initialPose=pose;
 
         } else {
+          pose=Number(pose).toFixed(6);
           frustums.mesh.visible=(pose-Math.floor(pose)==0) && !viewer.mode.play && !viewer.mode.scrolling;
           frustums.mesh.geometry.drawcalls[0].start=pose*18;
 
