@@ -190,7 +190,7 @@ var viewer={
           });
 
           if (view.extrinsics==undefined && viewer.posesOnly) return true;
-	
+
           // add thumbnail to html
           html+='<a class="landscape" data-key="'+view.key+'"'+(view.extrinsics!==undefined?' data-pose="'+view.extrinsics+'">':'>')+'<i></i></a>';
 
@@ -591,14 +591,23 @@ var viewer={
       var pose=viewer.getPoseExtrinsics(poseIndex);
 
       // cancel relative position/rotation on second click
+      var rel;
       if (poseIndex!=viewer.pose) { 
-        var rel=viewer.getRelativeCameraExtrinsics();
+        rel=viewer.rel=viewer.getRelativeCameraExtrinsics();
+        viewer.rel_active=true;
 
       } else {
-        var rel={
-          t: [0,0,0],
-          R: [ [0,0,0], [0,0,0], [0,0,0] ]
-        }
+       if (!viewer.rel || viewer.rel_active) {
+          rel={
+            t: [0,0,0],
+            R: [ [0,0,0], [0,0,0], [0,0,0] ]
+          };
+          viewer.rel_active=false;
+
+       } else {
+          rel=viewer.rel;
+          viewer.rel_active=true;
+       }
       }
 
       var dest={
