@@ -613,8 +613,9 @@ var viewer={
         viewer.rel_active=true;
 
       } else {
-       if (relativeExtrinsicsNotNull && viewer.rel_active) {
+       if (relativeExtrinsicsNotNull && (viewer.rel_active || options.pose!=viewer.pose)) {
          viewer.rel=_rel;
+         viewer.rel_active=true;
        }
 
        if (!viewer.rel || (!viewer.rel_active && options.pose!=viewer.pose) || (viewer.rel_active && options.pose==viewer.pose)) {
