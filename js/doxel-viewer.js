@@ -116,6 +116,13 @@ $(document).ready(function(){
 
 /**
 * @object viewer
+*
+* @event {load} Thumbnails have been loaded
+* @event {showpose} Pose has been displayed
+*   @param poseIndex
+*   @param whileScrolling
+* @event {stop} Play mode has been stopped
+*
 */
 var viewer={
     /**
@@ -589,54 +596,12 @@ var viewer={
       var scrolling=options.scrolling;
 
       var pose=viewer.getPoseExtrinsics(poseIndex);
-
-      // toggle relative position/rotation
-      var rel;
-      var _rel=viewer.getRelativeCameraExtrinsics();
-      var relativeExtrinsicsNotNull= !viewer.rel || viewer.rel && (
-        Math.abs(_rel.t[0]-viewer.rel.t[0])>1e-6 ||
-        Math.abs(_rel.t[1]-viewer.rel.t[1])>1e-6 ||
-        Math.abs(_rel.t[2]-viewer.rel.t[2])>1e-6 ||
-        Math.abs(_rel.R[0][0]-viewer.rel.R[0][0])>1e-6 ||
-        Math.abs(_rel.R[0][1]-viewer.rel.R[0][1])>1e-6 ||
-        Math.abs(_rel.R[0][2]-viewer.rel.R[0][2])>1e-6 ||
-        Math.abs(_rel.R[1][0]-viewer.rel.R[1][0])>1e-6 ||
-        Math.abs(_rel.R[1][1]-viewer.rel.R[1][1])>1e-6 ||
-        Math.abs(_rel.R[1][2]-viewer.rel.R[1][2])>1e-6 ||
-        Math.abs(_rel.R[2][0]-viewer.rel.R[2][0])>1e-6 ||
-        Math.abs(_rel.R[2][1]-viewer.rel.R[2][1])>1e-6 ||
-        Math.abs(_rel.R[2][2]-viewer.rel.R[2][2])>1e-6
-      );
-
-      if (!viewer.rel && relativeExtrinsicsNotNull) {
-        rel=viewer.rel=_rel;
-        viewer.rel_active=true;
-
-      } else {
-       if (relativeExtrinsicsNotNull && (viewer.rel_active || options.pose!=viewer.pose)) {
-         viewer.rel=_rel;
-         viewer.rel_active=true;
-       }
-
-       if (!viewer.rel || (!viewer.rel_active && options.pose!=viewer.pose) || (viewer.rel_active && options.pose==viewer.pose)) {
-          rel={
-            t: [0,0,0],
-            R: [ [0,0,0], [0,0,0], [0,0,0] ]
-          };
-          viewer.rel_active=false;
-
-       } else {
-          rel=viewer.rel;
-          viewer.rel_active=true;
-       }
-      }
-
       var dest={
         t: pose.position,
         R: pose.rotation
       }
 
-      viewer.prevPose=poseIndex;
+      var rel=viewer.relativeCameraCoordinates(poseIndex); 
 
       viewer.goto({
         position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
@@ -655,6 +620,86 @@ var viewer={
       });
 
     }, // viewer_showPose
+
+    /**
+    * @method viewer.relativeCameraCoordinates
+    *
+    * Save/Load/Toggle/Return relative camera coordinates
+    *
+    * @param {Number} [pose]
+    * @return {Object} [rel] The relative camera coordinates
+    */
+    relativeCameraCoordinates: function viewer_relativeCameraCoordinates(pose) {
+
+      // zero relative coordinates
+      var zorel={
+        t: [0,0,0],
+        R: [ [0,0,0], [0,0,0], [0,0,0] ]
+      };
+
+      var result=zorel;
+
+      var _rel=viewer.getRelativeCameraExtrinsics();
+      var poseChanged=(viewer.pose!=pose);
+
+      // check whether _rel and viewer.rel are different
+      var _relChanged=!viewer.rel || (
+        Math.abs(_rel.t[0]-viewer.rel.t[0])>1e-5 ||
+        Math.abs(_rel.t[1]-viewer.rel.t[1])>1e-5 ||
+        Math.abs(_rel.t[2]-viewer.rel.t[2])>1e-5 ||
+        Math.abs(_rel.R[0][0]-viewer.rel.R[0][0])>1e-5 ||
+        Math.abs(_rel.R[0][1]-viewer.rel.R[0][1])>1e-5 ||
+        Math.abs(_rel.R[0][2]-viewer.rel.R[0][2])>1e-5 ||
+        Math.abs(_rel.R[1][0]-viewer.rel.R[1][0])>1e-5 ||
+        Math.abs(_rel.R[1][1]-viewer.rel.R[1][1])>1e-5 ||
+        Math.abs(_rel.R[1][2]-viewer.rel.R[1][2])>1e-5 ||
+        Math.abs(_rel.R[2][0]-viewer.rel.R[2][0])>1e-5 ||
+        Math.abs(_rel.R[2][1]-viewer.rel.R[2][1])>1e-5 ||
+        Math.abs(_rel.R[2][2]-viewer.rel.R[2][2])>1e-5
+      );
+
+      var _relNotNull=_rel &&  (
+        Math.abs(_rel.t[0])>1e-5 ||
+        Math.abs(_rel.t[1])>1e-5 ||
+        Math.abs(_rel.t[2])>1e-5 ||
+        Math.abs(_rel.R[0][0])>1e-5 ||
+        Math.abs(_rel.R[0][1])>1e-5 ||
+        Math.abs(_rel.R[0][2])>1e-5 ||
+        Math.abs(_rel.R[1][0])>1e-5 ||
+        Math.abs(_rel.R[1][1])>1e-5 ||
+        Math.abs(_rel.R[1][2])>1e-5 ||
+        Math.abs(_rel.R[2][0])>1e-5 ||
+        Math.abs(_rel.R[2][1])>1e-5 ||
+        Math.abs(_rel.R[2][2])>1e-5
+      );
+
+      if (_relNotNull) {
+        if (_relChanged) {
+          // save and activate camera relative coordinates 
+          viewer.rel=_rel;
+          viewer.rel_active=true;
+        }
+      }
+
+      if (poseChanged) {
+        if (viewer.rel && viewer.rel_active) {
+          // load and activate saved camera realtive coordinates
+          result=viewer.rel;
+        }
+
+      } else {
+        if (!viewer.rel || !viewer.rel_active) {
+          // load and activate saved camera realtive coordinates
+          result=viewer.rel;
+        }
+
+      }
+
+      viewer.rel_active=(result!=zorel);
+
+      return result;
+
+    }, // viewer.relativeCameraCoordinates
 
     /**
     * @method viewer.getPoseExtrinsics
@@ -788,7 +833,7 @@ var viewer={
           pc.z-pp[2]
         ],
         R: [
-          [ Rc[0][0]-Rp[0][0], Rc[0][0]-Rp[0][1], Rc[0][2]-Rp[0][2] ],
+          [ Rc[0][0]-Rp[0][0], Rc[0][1]-Rp[0][1], Rc[0][2]-Rp[0][2] ],
           [ Rc[1][0]-Rp[1][0], Rc[1][1]-Rp[1][1], Rc[1][2]-Rp[1][2] ],
           [ Rc[2][0]-Rp[2][0], Rc[2][1]-Rp[2][1], Rc[2][2]-Rp[2][2] ]
         ]
@@ -1174,7 +1219,7 @@ var frustums={
           frustums.initialPose=pose;
 
         } else {
-          pose=Number(pose).toFixed(6);
+          pose=Number(pose).toFixed(5);
           frustums.mesh.visible=(pose-Math.floor(pose)==0) && !viewer.mode.play && !viewer.mode.scrolling;
           frustums.mesh.geometry.drawcalls[0].start=pose*18;
 
