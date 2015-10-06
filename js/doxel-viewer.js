@@ -1130,7 +1130,23 @@ var viewer={
           i=viewer.data.extrinsics.length-1;
         }
 
-        viewer.moveCamera(viewer.getPoseExtrinsics(i.toFixed(1)));
+        var poseIndex=i.toFixed(1);
+        var pose=viewer.getPoseExtrinsics(poseIndex);
+        var dest={
+          t: pose.position,
+          R: pose.rotation
+        }
+
+        var rel=viewer.relativeCameraCoordinates(poseIndex); 
+
+        viewer.moveCamera({
+          position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
+          rotation: [
+            [dest.R[0][0]+rel.R[0][0],dest.R[0][1]+rel.R[0][1],dest.R[0][2]+rel.R[0][2]],
+            [dest.R[1][0]+rel.R[1][0],dest.R[1][1]+rel.R[1][1],dest.R[1][2]+rel.R[1][2]],
+            [dest.R[2][0]+rel.R[2][0],dest.R[2][1]+rel.R[2][1],dest.R[2][2]+rel.R[2][2]]
+          ]
+        });
         $(viewer).trigger('showpose',[i]);
 
         // on last frame
