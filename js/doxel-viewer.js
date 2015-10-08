@@ -601,17 +601,29 @@ var viewer={
         R: pose.rotation
       }
 
-      var rel=viewer.relativeCameraCoordinates(poseIndex); 
+      var cam;
+      if (viewer.mode.showFirstPose) {
+
+        // Disable camera relative positionning for first pose displayed
+        // because the pose coordinates system is generally not aligned
+        // with the world and the inital webgl camera vertical axis.
+        cam={
+          position: dest.t,
+          rotation: dest.R
+        }
+
+      } else {
+        var rel=viewer.relativeCameraCoordinates(poseIndex);
+        cam=viewer.applyRelativeCameraSettings(dest,rel);
+
+      }
 
       viewer.goto({
-        position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
-        rotation: [
-          [dest.R[0][0]+rel.R[0][0],dest.R[0][1]+rel.R[0][1],dest.R[0][2]+rel.R[0][2]],
-          [dest.R[1][0]+rel.R[1][0],dest.R[1][1]+rel.R[1][1],dest.R[1][2]+rel.R[1][2]],
-          [dest.R[2][0]+rel.R[2][0],dest.R[2][1]+rel.R[2][1],dest.R[2][2]+rel.R[2][2]]
-        ],
+        position: cam.position,
+        rotation: cam.rotation,
         steps: options.steps||10,
         callback: function() {
+          viewer.showFirstPose=false;
           $(viewer).trigger('showpose',[poseIndex]);
           if (options.callback) {
             options.callback();
@@ -675,7 +687,7 @@ var viewer={
 
       if (_relNotNull) {
         if (_relChanged) {
-          // save and activate camera relative coordinates 
+          // save and activate camera relative coordinates
           viewer.rel=_rel;
           viewer.rel_active=true;
         }
@@ -718,7 +730,7 @@ var viewer={
       // get pose extrinsics
       if (viewer.data.extrinsics.length<=pose0.index) return;
       pose0.extrinsics=viewer.data.extrinsics[pose0.index].value;
-      
+
       if (frac && pose0.index+1<viewer.data.extrinsics.length) {
         // interpolate inter-pose camera position/rotation
         var pose1={
@@ -825,17 +837,55 @@ var viewer={
       var Rp=extrinsics.rotation;
       var pp=extrinsics.position;
 
-      // camera position and rotation relative to viewer.pose
+      // camera position relative to pose position, in world coordinates
+      var wcx=pc.x-pp[0];
+      var wcy=pc.y-pp[1];
+      var wcz=pc.z-pp[2];
+
+      var poseR00=Rp[0][0];
+      var poseR01=Rp[0][1];
+      var poseR02=Rp[0][2];
+      var poseR10=Rp[1][0];
+      var poseR11=Rp[1][1];
+      var poseR12=Rp[1][2];
+      var poseR20=Rp[2][0];
+      var poseR21=Rp[2][1];
+      var poseR22=Rp[2][2];
+
+      var camR00=Rc[0][0];
+      var camR01=Rc[0][1];
+      var camR02=Rc[0][2];
+      var camR10=Rc[1][0];
+      var camR11=Rc[1][1];
+      var camR12=Rc[1][2];
+      var camR20=Rc[2][0];
+      var camR21=Rc[2][1];
+      var camR22=Rc[2][2];
+
       return {
+        // camera position relative to pose position, in pose coordinates space
         t: [
-          pc.x-pp[0],
-          pc.y-pp[1],
-          pc.z-pp[2]
+          wcx*poseR00+wcy*poseR01+wcz*poseR02,
+          wcx*poseR10+wcy*poseR11+wcz*poseR12,
+          wcx*poseR20+wcy*poseR21+wcz*poseR22
         ],
         R: [
-          [ Rc[0][0]-Rp[0][0], Rc[0][1]-Rp[0][1], Rc[0][2]-Rp[0][2] ],
-          [ Rc[1][0]-Rp[1][0], Rc[1][1]-Rp[1][1], Rc[1][2]-Rp[1][2] ],
-          [ Rc[2][0]-Rp[2][0], Rc[2][1]-Rp[2][1], Rc[2][2]-Rp[2][2] ]
+            // camera rotation in the pose coordinates space
+            [
+              camR00*poseR00+camR01*poseR01+camR02*poseR02,
+              camR00*poseR10+camR01*poseR11+camR02*poseR12,
+              camR00*poseR20+camR01*poseR21+camR02*poseR22
+            ],
+            [
+              camR10*poseR00+camR11*poseR01+camR12*poseR02,
+              camR10*poseR10+camR11*poseR11+camR12*poseR12,
+              camR10*poseR20+camR11*poseR21+camR12*poseR22
+            ],
+            [
+              camR20*poseR00+camR21*poseR01+camR22*poseR02,
+              camR20*poseR10+camR21*poseR11+camR22*poseR12,
+              camR20*poseR20+camR21*poseR21+camR22*poseR22
+            ]
         ]
       };
 
@@ -1085,8 +1135,10 @@ var viewer={
     showFirstPose: function viewer_showFirstPose() {
       var a=$('#thumbnails a[data-pose]:first');
       if (a.length) {
+        viewer.mode.showFirstPose=true;
         viewer.showPose({
           pose: a.data('pose'),
+          steps: 1,
           callback: function() {
             if (viewer.window.controls.target0) {
               viewer.window.controls.target0.copy(viewer.window.controls.target);
@@ -1137,16 +1189,9 @@ var viewer={
           R: pose.rotation
         }
 
-        var rel=viewer.relativeCameraCoordinates(poseIndex); 
+        var rel=viewer.relativeCameraCoordinates(poseIndex);
 
-        viewer.moveCamera({
-          position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
-          rotation: [
-            [dest.R[0][0]+rel.R[0][0],dest.R[0][1]+rel.R[0][1],dest.R[0][2]+rel.R[0][2]],
-            [dest.R[1][0]+rel.R[1][0],dest.R[1][1]+rel.R[1][1],dest.R[1][2]+rel.R[1][2]],
-            [dest.R[2][0]+rel.R[2][0],dest.R[2][1]+rel.R[2][1],dest.R[2][2]+rel.R[2][2]]
-          ]
-        });
+        viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,rel));
         $(viewer).trigger('showpose',[i]);
 
         // on last frame
@@ -1175,17 +1220,82 @@ var viewer={
       var dest=viewer.getPoseExtrinsics(pose);
       dest.t=dest.position;
       dest.R=dest.rotation;
+
       var rel=viewer.getRelativeCameraExtrinsics();
-      viewer.moveCamera({
-        position: [dest.t[0]+rel.t[0],dest.t[1]+rel.t[1],dest.t[2]+rel.t[2]],
-        rotation: [
-          [dest.R[0][0]+rel.R[0][0],dest.R[0][1]+rel.R[0][1],dest.R[0][2]+rel.R[0][2]],
-          [dest.R[1][0]+rel.R[1][0],dest.R[1][1]+rel.R[1][1],dest.R[1][2]+rel.R[1][2]],
-          [dest.R[2][0]+rel.R[2][0],dest.R[2][1]+rel.R[2][1],dest.R[2][2]+rel.R[2][2]]
-        ]
-      });
+      viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,rel));
+
       $(viewer).trigger('showpose', [pose,true]);
-    }
+
+    }, // viewer.whileScrolling
+
+    /**
+    * @method viewer.applyRelativeCameraSettings
+    *
+    * Convert transformation vertices to pose coordinates space
+    *
+    * @param {Object} [dest]
+    *   @param {Array} [dest.t]
+    *   @param {Array} [dest.R]
+    * @param {Object} [rel]
+    *   @param {Array} [rel.t]
+    *   @param {Array} [rel.R]
+    *
+    * @return {Object} [Rt]
+    *   @return {Array} [Rt.position]
+    *   @return {Array} [Rt.rotation]
+    */
+    applyRelativeCameraSettings: function viewer_applyRelativeCameraSettings(pose,rel) {
+
+      var poseR00=pose.R[0][0];
+      var poseR01=pose.R[0][1];
+      var poseR02=pose.R[0][2];
+      var poseR10=pose.R[1][0];
+      var poseR11=pose.R[1][1];
+      var poseR12=pose.R[1][2];
+      var poseR20=pose.R[2][0];
+      var poseR21=pose.R[2][1];
+      var poseR22=pose.R[2][2];
+
+      var relR00=rel.R[0][0];
+      var relR01=rel.R[0][1];
+      var relR02=rel.R[0][2];
+      var relR10=rel.R[1][0];
+      var relR11=rel.R[1][1];
+      var relR12=rel.R[1][2];
+      var relR20=rel.R[2][0];
+      var relR21=rel.R[2][1];
+      var relR22=rel.R[2][2];
+
+      var relt0=rel.t[0];
+      var relt1=rel.t[1];
+      var relt2=rel.t[2];
+
+      return {
+        position: [
+          pose.t[0]+relt0*poseR00+relt1*poseR10+relt2*poseR20,
+          pose.t[1]+relt0*poseR01+relt1*poseR11+relt2*poseR21,
+          pose.t[2]+relt0*poseR02+relt1*poseR12+relt2*poseR22
+        ],
+
+        rotation: [
+          [
+            relR00*poseR00+relR01*poseR10+relR02*poseR20,
+            relR00*poseR01+relR01*poseR11+relR02*poseR21,
+            relR00*poseR02+relR01*poseR12+relR02*poseR22
+          ], [
+            relR10*poseR00+relR11*poseR10+relR12*poseR20,
+            relR10*poseR01+relR11*poseR11+relR12*poseR21,
+            relR10*poseR02+relR11*poseR12+relR12*poseR22
+          ], [
+            relR20*poseR00+relR21*poseR10+relR22*poseR20,
+            relR20*poseR01+relR21*poseR11+relR22*poseR21,
+            relR20*poseR02+relR21*poseR12+relR22*poseR22
+          ]
+        ]
+      };
+
+    } // viewer.applyRelativeCameraSettings
+
 } // viewer
 
 
@@ -1355,5 +1465,4 @@ var frustums={
 
     } // frustums.parse_ply
 
-}
-
+} // frustums
