@@ -1227,11 +1227,15 @@ var viewer={
     whileScrolling: function viewer_whileScrolling() {
       var pose=(viewer.data.extrinsics.length-1)*this.mcs.leftPct/100;
       var dest=viewer.getPoseExtrinsics(pose);
-      dest.t=dest.position;
-      dest.R=dest.rotation;
 
-      var rel=viewer.relativeCameraCoordinates();
-      viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,rel));
+      if (viewer.rel_active)
+        dest.t=dest.position;
+        dest.R=dest.rotation;
+        viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,viewer.rel));
+
+      } else {
+        viewer.moveCamera(dest);
+      }
 
       $(viewer).trigger('showpose', [pose,true]);
 
