@@ -623,7 +623,6 @@ var viewer={
         rotation: cam.rotation,
         steps: options.steps||10,
         callback: function() {
-          viewer.showFirstPose=false;
           $(viewer).trigger('showpose',[poseIndex]);
           if (options.callback) {
             options.callback();
@@ -646,7 +645,7 @@ var viewer={
       // zero relative coordinates
       var zorel={
         t: [0,0,0],
-        R: [ [0,0,0], [0,0,0], [0,0,0] ]
+        R: [ [1,0,0], [0,1,0], [0,0,1] ]
       };
 
       var result=zorel;
@@ -674,15 +673,15 @@ var viewer={
         Math.abs(_rel.t[0])>1e-5 ||
         Math.abs(_rel.t[1])>1e-5 ||
         Math.abs(_rel.t[2])>1e-5 ||
-        Math.abs(_rel.R[0][0])>1e-5 ||
+        Math.abs(_rel.R[0][0])-1>1e-5 ||
         Math.abs(_rel.R[0][1])>1e-5 ||
         Math.abs(_rel.R[0][2])>1e-5 ||
         Math.abs(_rel.R[1][0])>1e-5 ||
-        Math.abs(_rel.R[1][1])>1e-5 ||
+        Math.abs(_rel.R[1][1])-1>1e-5 ||
         Math.abs(_rel.R[1][2])>1e-5 ||
         Math.abs(_rel.R[2][0])>1e-5 ||
         Math.abs(_rel.R[2][1])>1e-5 ||
-        Math.abs(_rel.R[2][2])>1e-5
+        Math.abs(_rel.R[2][2])-1>1e-5
       );
 
       if (_relNotNull) {
@@ -1069,6 +1068,7 @@ var viewer={
       if (_window.controls.target) {
         // copy the lookAt vector to orbit controls targets
         _window.controls.target.copy(lookAt);
+        _window.controls.target0.copy(lookAt);
 
       } else {
         // set the camera lookAt vector
@@ -1140,6 +1140,7 @@ var viewer={
           pose: a.data('pose'),
           steps: 1,
           callback: function() {
+            viewer.mode.showFirstPose=false;
             if (viewer.window.controls.target0) {
               viewer.window.controls.target0.copy(viewer.window.controls.target);
             }
@@ -1245,6 +1246,13 @@ var viewer={
     *   @return {Array} [Rt.rotation]
     */
     applyRelativeCameraSettings: function viewer_applyRelativeCameraSettings(pose,rel) {
+
+      if (!viewer.rel_active) {
+        return {
+           position: pose.t,
+           rotation: pose.R
+        }
+      }
 
       var poseR00=pose.R[0][0];
       var poseR01=pose.R[0][1];
