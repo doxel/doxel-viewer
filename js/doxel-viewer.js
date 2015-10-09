@@ -1145,11 +1145,13 @@ var viewer={
       var a=$('#thumbnails a[data-pose]:first');
       if (a.length) {
         viewer.mode.showFirstPose=true;
+        viewer.mode.firstPoseShown=false;
         viewer.showPose({
           pose: a.data('pose'),
           steps: 1,
           callback: function() {
             viewer.mode.showFirstPose=false;
+            viewer.mode.firstPoseShown=true;
             if (viewer.window.controls.target0) {
               viewer.window.controls.target0.copy(viewer.window.controls.target);
             }
@@ -1169,7 +1171,7 @@ var viewer={
       var incr;
       var _window=viewer.window;
 
-      if (!_window || !_window.camera) {
+      if (!_window || !_window.camera || !viewer.mode.firstPoseShown) {
         clearTimeout(viewer.playTimeout);
         viewer.playTimeout=setTimeout(function(){
           viewer.play();
