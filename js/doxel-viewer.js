@@ -173,7 +173,8 @@ var viewer={
         $('#thumbnails').mCustomScrollbar({
           axis: 'x',
           callbacks: {
-            whileScrolling: viewer.whileScrolling
+            whileScrolling: viewer.whileScrolling,
+            onScroll: viewer.onScroll
           }
         });
 
@@ -699,7 +700,7 @@ var viewer={
         }
       }
 
-      if (poseChanged || viewer.mode.play || viewer.mode.scrolling) {
+      if (poseChanged) {
         if (viewer.rel && viewer.rel_active) {
           // load and activate saved camera realtive coordinates
           result=viewer.rel;
@@ -1193,14 +1194,19 @@ var viewer={
 
         var poseIndex=i.toFixed(1);
         var pose=viewer.getPoseExtrinsics(poseIndex);
-        var dest={
-          t: pose.position,
-          R: pose.rotation
-        }
 
         var rel=viewer.relativeCameraCoordinates();
 
-        viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,rel));
+        if (viewer.rel_active) {
+          viewer.moveCamera(viewer.applyRelativeCameraSettings({
+            t: pose.position,
+            R: pose.rotation
+          },rel));
+
+        } else {
+          viewer.moveCamera(pose);
+        }
+
         $(viewer).trigger('showpose',[i]);
 
         // on last frame
@@ -1228,6 +1234,12 @@ var viewer={
       var pose=(viewer.data.extrinsics.length-1)*this.mcs.leftPct/100;
       var dest=viewer.getPoseExtrinsics(pose);
 
+      if (!viewer.mode.scrolling) {
+        // get/update relative coordinates before scrolling
+        var rel=viewer.relativeCameraCoordinates();
+        viewer.mode.scrolling=true;
+      }
+
       if (viewer.rel_active) {
         dest.t=dest.position;
         dest.R=dest.rotation;
@@ -1240,6 +1252,13 @@ var viewer={
       $(viewer).trigger('showpose', [pose,true]);
 
     }, // viewer.whileScrolling
+
+    /**
+    * @method viewer.onScroll
+    */
+    onScroll: function viewer_onScroll() {
+      viewer.mode.scrolling=false;
+    }, // viewer.onScroll
 
     /**
     * @method viewer.applyRelativeCameraSettings
