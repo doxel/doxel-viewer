@@ -1228,7 +1228,7 @@ var viewer={
       var pose=(viewer.data.extrinsics.length-1)*this.mcs.leftPct/100;
       var dest=viewer.getPoseExtrinsics(pose);
 
-      if (viewer.rel_active)
+      if (viewer.rel_active) {
         dest.t=dest.position;
         dest.R=dest.rotation;
         viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,viewer.rel));
