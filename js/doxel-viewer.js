@@ -146,6 +146,17 @@ var viewer={
     pose: 0,
 
     /**
+    * @property viewer.zorel
+    *
+    * zero relative coordinates
+    *
+    */
+    zorel: {
+      t: [0,0,0],
+      R: [ [0,0,0], [0,0,0], [0,0,0] ]
+    },
+
+    /**
     * @property viewer.mode
     */
     mode: {},
@@ -155,6 +166,7 @@ var viewer={
     */
     init: function viewer_init() {
 
+        viewer.rel=viewer.zorel;
         viewer.addThumbnails();
         viewer.getJpegMetadata(viewer.loadThumbnails);
 
@@ -551,7 +563,7 @@ var viewer={
       // target pose index
       var pose=this.dataset.pose;
       if (pose!==undefined) {
-        frustums.mesh.visible=false;
+        frustums.hide();
         viewer.showPose(pose);
 
       }
@@ -637,54 +649,49 @@ var viewer={
     *
     * Save/Load/Toggle/Return relative camera coordinates
     *
-    * @param {Number} [pose]
+    * @param {Number} [pose] Used to toggle back to original coordinates
     * @return {Object} [rel] The relative camera coordinates
     */
     relativeCameraCoordinates: function viewer_relativeCameraCoordinates(pose) {
 
-      // zero relative coordinates
-      var zorel={
-        t: [0,0,0],
-        R: [ [1,0,0], [0,1,0], [0,0,1] ]
-      };
-
-      var result=zorel;
+      var result=viewer.zorel;
 
       var _rel=viewer.getRelativeCameraExtrinsics();
       var poseChanged=(viewer.pose!=pose);
-
-      // check whether _rel and viewer.rel are different
-      var _relChanged=!viewer.rel || (
-        Math.abs(_rel.t[0]-viewer.rel.t[0])>1e-5 ||
-        Math.abs(_rel.t[1]-viewer.rel.t[1])>1e-5 ||
-        Math.abs(_rel.t[2]-viewer.rel.t[2])>1e-5 ||
-        Math.abs(_rel.R[0][0]-viewer.rel.R[0][0])>1e-5 ||
-        Math.abs(_rel.R[0][1]-viewer.rel.R[0][1])>1e-5 ||
-        Math.abs(_rel.R[0][2]-viewer.rel.R[0][2])>1e-5 ||
-        Math.abs(_rel.R[1][0]-viewer.rel.R[1][0])>1e-5 ||
-        Math.abs(_rel.R[1][1]-viewer.rel.R[1][1])>1e-5 ||
-        Math.abs(_rel.R[1][2]-viewer.rel.R[1][2])>1e-5 ||
-        Math.abs(_rel.R[2][0]-viewer.rel.R[2][0])>1e-5 ||
-        Math.abs(_rel.R[2][1]-viewer.rel.R[2][1])>1e-5 ||
-        Math.abs(_rel.R[2][2]-viewer.rel.R[2][2])>1e-5
-      );
 
       var _relNotNull=_rel &&  (
         Math.abs(_rel.t[0])>1e-5 ||
         Math.abs(_rel.t[1])>1e-5 ||
         Math.abs(_rel.t[2])>1e-5 ||
-        Math.abs(_rel.R[0][0])-1>1e-5 ||
+        Math.abs(_rel.R[0][0])>1e-5 ||
         Math.abs(_rel.R[0][1])>1e-5 ||
         Math.abs(_rel.R[0][2])>1e-5 ||
         Math.abs(_rel.R[1][0])>1e-5 ||
-        Math.abs(_rel.R[1][1])-1>1e-5 ||
+        Math.abs(_rel.R[1][1])>1e-5 ||
         Math.abs(_rel.R[1][2])>1e-5 ||
         Math.abs(_rel.R[2][0])>1e-5 ||
         Math.abs(_rel.R[2][1])>1e-5 ||
-        Math.abs(_rel.R[2][2])-1>1e-5
+        Math.abs(_rel.R[2][2])>1e-5
       );
 
       if (_relNotNull) {
+
+        // check whether _rel and viewer.rel are different
+        var _relChanged=!viewer.rel || (
+          Math.abs(_rel.t[0]-viewer.rel.t[0])>1e-5 ||
+          Math.abs(_rel.t[1]-viewer.rel.t[1])>1e-5 ||
+          Math.abs(_rel.t[2]-viewer.rel.t[2])>1e-5 ||
+          Math.abs(_rel.R[0][0]-viewer.rel.R[0][0])>1e-5 ||
+          Math.abs(_rel.R[0][1]-viewer.rel.R[0][1])>1e-5 ||
+          Math.abs(_rel.R[0][2]-viewer.rel.R[0][2])>1e-5 ||
+          Math.abs(_rel.R[1][0]-viewer.rel.R[1][0])>1e-5 ||
+          Math.abs(_rel.R[1][1]-viewer.rel.R[1][1])>1e-5 ||
+          Math.abs(_rel.R[1][2]-viewer.rel.R[1][2])>1e-5 ||
+          Math.abs(_rel.R[2][0]-viewer.rel.R[2][0])>1e-5 ||
+          Math.abs(_rel.R[2][1]-viewer.rel.R[2][1])>1e-5 ||
+          Math.abs(_rel.R[2][2]-viewer.rel.R[2][2])>1e-5
+        );
+
         if (_relChanged) {
           // save and activate camera relative coordinates
           viewer.rel=_rel;
@@ -692,7 +699,7 @@ var viewer={
         }
       }
 
-      if (poseChanged) {
+      if (poseChanged || viewer.mode.play || viewer.mode.scrolling) {
         if (viewer.rel && viewer.rel_active) {
           // load and activate saved camera realtive coordinates
           result=viewer.rel;
@@ -706,7 +713,7 @@ var viewer={
 
       }
 
-      viewer.rel_active=(result!=zorel);
+      viewer.rel_active=(result!=viewer.zorel);
 
       return result;
 
@@ -851,15 +858,16 @@ var viewer={
       var poseR21=Rp[2][1];
       var poseR22=Rp[2][2];
 
-      var camR00=Rc[0][0];
-      var camR01=Rc[0][1];
-      var camR02=Rc[0][2];
-      var camR10=Rc[1][0];
-      var camR11=Rc[1][1];
-      var camR12=Rc[1][2];
-      var camR20=Rc[2][0];
-      var camR21=Rc[2][1];
-      var camR22=Rc[2][2];
+      // camera rotation relative to pose rotation, in world coordinates
+      var wcR00=Rc[0][0]-poseR00;
+      var wcR01=Rc[0][1]-poseR01;
+      var wcR02=Rc[0][2]-poseR02;
+      var wcR10=Rc[1][0]-poseR10;
+      var wcR11=Rc[1][1]-poseR11;
+      var wcR12=Rc[1][2]-poseR12;
+      var wcR20=Rc[2][0]-poseR20;
+      var wcR21=Rc[2][1]-poseR21;
+      var wcR22=Rc[2][2]-poseR22;
 
       return {
         // camera position relative to pose position, in pose coordinates space
@@ -871,19 +879,19 @@ var viewer={
         R: [
             // camera rotation in the pose coordinates space
             [
-              camR00*poseR00+camR01*poseR01+camR02*poseR02,
-              camR00*poseR10+camR01*poseR11+camR02*poseR12,
-              camR00*poseR20+camR01*poseR21+camR02*poseR22
+              wcR00*poseR00+wcR01*poseR01+wcR02*poseR02,
+              wcR00*poseR10+wcR01*poseR11+wcR02*poseR12,
+              wcR00*poseR20+wcR01*poseR21+wcR02*poseR22
             ],
             [
-              camR10*poseR00+camR11*poseR01+camR12*poseR02,
-              camR10*poseR10+camR11*poseR11+camR12*poseR12,
-              camR10*poseR20+camR11*poseR21+camR12*poseR22
+              wcR10*poseR00+wcR11*poseR01+wcR12*poseR02,
+              wcR10*poseR10+wcR11*poseR11+wcR12*poseR12,
+              wcR10*poseR20+wcR11*poseR21+wcR12*poseR22
             ],
             [
-              camR20*poseR00+camR21*poseR01+camR22*poseR02,
-              camR20*poseR10+camR21*poseR11+camR22*poseR12,
-              camR20*poseR20+camR21*poseR21+camR22*poseR22
+              wcR20*poseR00+wcR21*poseR01+wcR22*poseR02,
+              wcR20*poseR10+wcR21*poseR11+wcR22*poseR12,
+              wcR20*poseR20+wcR21*poseR21+wcR22*poseR22
             ]
         ]
       };
@@ -1190,7 +1198,7 @@ var viewer={
           R: pose.rotation
         }
 
-        var rel=viewer.relativeCameraCoordinates(poseIndex);
+        var rel=viewer.relativeCameraCoordinates();
 
         viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,rel));
         $(viewer).trigger('showpose',[i]);
@@ -1222,7 +1230,7 @@ var viewer={
       dest.t=dest.position;
       dest.R=dest.rotation;
 
-      var rel=viewer.getRelativeCameraExtrinsics();
+      var rel=viewer.relativeCameraCoordinates();
       viewer.moveCamera(viewer.applyRelativeCameraSettings(dest,rel));
 
       $(viewer).trigger('showpose', [pose,true]);
@@ -1287,17 +1295,17 @@ var viewer={
 
         rotation: [
           [
-            relR00*poseR00+relR01*poseR10+relR02*poseR20,
-            relR00*poseR01+relR01*poseR11+relR02*poseR21,
-            relR00*poseR02+relR01*poseR12+relR02*poseR22
+            poseR00+relR00*poseR00+relR01*poseR10+relR02*poseR20,
+            poseR01+relR00*poseR01+relR01*poseR11+relR02*poseR21,
+            poseR02+relR00*poseR02+relR01*poseR12+relR02*poseR22
           ], [
-            relR10*poseR00+relR11*poseR10+relR12*poseR20,
-            relR10*poseR01+relR11*poseR11+relR12*poseR21,
-            relR10*poseR02+relR11*poseR12+relR12*poseR22
+            poseR10+relR10*poseR00+relR11*poseR10+relR12*poseR20,
+            poseR11+relR10*poseR01+relR11*poseR11+relR12*poseR21,
+            poseR12+relR10*poseR02+relR11*poseR12+relR12*poseR22
           ], [
-            relR20*poseR00+relR21*poseR10+relR22*poseR20,
-            relR20*poseR01+relR21*poseR11+relR22*poseR21,
-            relR20*poseR02+relR21*poseR12+relR22*poseR22
+            poseR20+relR20*poseR00+relR21*poseR10+relR22*poseR20,
+            poseR21+relR20*poseR01+relR21*poseR11+relR22*poseR21,
+            poseR22+relR20*poseR02+relR21*poseR12+relR22*poseR22
           ]
         ]
       };
@@ -1311,6 +1319,11 @@ var viewer={
 * @object frustums
 */
 var frustums={
+
+    mode: {
+      all: false,
+      always: false
+    },
 
     /**
     * @property frustums.url
@@ -1354,9 +1367,16 @@ var frustums={
 
         } else {
           pose=Number(pose).toFixed(5);
-          frustums.mesh.visible=(pose-Math.floor(pose)==0) && !viewer.mode.play && !viewer.mode.scrolling;
-          frustums.mesh.geometry.drawcalls[0].start=pose*18;
 
+          if (!frustums.mode.all) {
+            frustums.changeTo(pose);
+          }
+
+          frustums.mesh.visible= frustums.mode.always || (
+            (pose-Math.floor(pose)==0 || frustums.mode.all) &&
+            !viewer.mode.play &&
+            !viewer.mode.scrolling
+          );
         }
       });
 
@@ -1389,8 +1409,6 @@ var frustums={
       geometry.addAttribute('position', new THREE.BufferAttribute(frustums.position,3));
       geometry.addAttribute('index', new THREE.BufferAttribute(frustums.index,3));
 
-      geometry.addDrawCall(frustums.initialPose*18,18,0);
-
       // init material
       var material=new THREE.MeshBasicMaterial({
         color: frustums.color,
@@ -1401,6 +1419,10 @@ var frustums={
 
       // init mesh
       frustums.mesh=new THREE.Mesh(geometry,material);
+
+      if (!frustums.mode.all) {
+        frustums.show(frustums.initialPose);
+      }
 
       window.scene.add(frustums.mesh);
 
@@ -1471,6 +1493,35 @@ var frustums={
 
       console.log(id,vertex_count*3+(vertex_count/5)*3);
 
-    } // frustums.parse_ply
+    }, // frustums.parse_ply
+
+    /**
+    * @method frustums.show
+    */
+    show: function frustums_show(pose) {
+      frustums.mesh.visible=true;
+
+      if (pose!=undefined) {
+        // add pose to draw list
+        frustums.mesh.geometry.addDrawCall(pose*18,18,0);
+      } else {
+        // draw all
+        frustums.mesh.geometry.drawcalls.splice(0,frustums.mesh.geometry.drawcalls.length)
+      }
+    },
+
+    /**
+    * @method frustums.hide
+    */
+    hide: function frustums_hide() {
+      frustums.mesh.visible=frustums.mode.always;
+    },
+
+    /**
+    * @method frustums.changeTo
+    */
+    changeTo: function frustums_changeTo(pose) {
+      frustums.mesh.geometry.drawcalls[0].start=Math.floor(pose)*18;
+    }
 
 } // frustums
