@@ -570,7 +570,22 @@ var viewer={
       var pose=this.dataset.pose;
       if (pose!==undefined) {
         frustums.hide();
-        viewer.showPose(pose);
+        viewer.showPose({
+          pose: pose,
+          callback: function(){
+            if (!viewer.rel_active) {
+              frustums.showImage(pose);
+            }
+            if (viewer.window.controls.target) {
+              var p=viewer.getPoseExtrinsics(pose);
+              viewer.window.controls.center=new viewer.window.THREE.Vector3(
+                p.position[0],
+                p.position[1],
+                p.position[2]
+              );
+            }
+          }
+        });
 
       }
 
@@ -1047,7 +1062,7 @@ var viewer={
 
       } else {
 
-        var pose0= {
+        var pose0={
           center: options.position,
           up: options.rotation[1],
           out: options.rotation[2]
@@ -1163,6 +1178,7 @@ var viewer={
             if (viewer.window.controls.position) {
               viewer.window.controls.position.copy(viewer.window.camera.position);
             }
+            $(viewer).trigger('firstpose');
           }
         });
       }
@@ -1172,6 +1188,7 @@ var viewer={
     * @method viewer.play
     */
     play: function viewer_play() {
+      return;
       var i=0;
       var incr;
       var _window=viewer.window;
@@ -1371,6 +1388,16 @@ var frustums={
     initialPose: 0,
 
     /**
+    * @property frustums.fadeInSteps
+    */
+    fadeInSteps: 1,
+
+    /**
+    * @property frustums.fadeOutSteps
+    */
+    fadeOutSteps: 1,
+
+    /**
     * @method frustums.init
     */
     init: function frustums_init(window) {
@@ -1391,6 +1418,13 @@ var frustums={
     */
     setupEventHandlers: function frustums_setupEventHandlers(){
 
+      // hide frustum image on orbitcontrols move start
+      // TODO: the same with other controls (fly and earth)
+      viewer.window.controls.addEventListener('start',function(){
+        if (frustums.imesh) frustums.imesh.fadeOut();
+      });
+
+      // show frustum on viewer 'showpose' event
       $(viewer).on('showpose',function(e,pose,scrolling){
         if (!frustums.mesh) {
           frustums.initialPose=pose;
@@ -1408,6 +1442,11 @@ var frustums={
             !viewer.mode.scrolling
           );
         }
+      });
+
+      // show frustum image on viewer 'firstpose' event
+      $(viewer).on('firstpose',function(e){
+        frustums.showImage(viewer.pose);
       });
 
     }, // frustums.setupEventHandlers
@@ -1538,20 +1577,207 @@ var frustums={
         // draw all
         frustums.mesh.geometry.drawcalls.splice(0,frustums.mesh.geometry.drawcalls.length)
       }
-    },
+    }, // frustums.show
 
     /**
     * @method frustums.hide
     */
     hide: function frustums_hide() {
       frustums.mesh.visible=frustums.mode.always;
-    },
+      if (!frustums.mesh.visible && frustums.imesh) {
+        frustums.imesh.fadeOut();
+      }
+    }, // frustums.hide
 
     /**
     * @method frustums.changeTo
     */
     changeTo: function frustums_changeTo(pose) {
       frustums.mesh.geometry.drawcalls[0].start=Math.floor(pose)*18;
-    }
+    }, // frustums.changeTo
+
+    /**
+    * @method frustums.showImage
+    */
+    showImage: function frustums_showImage(pose) {
+
+      // same pose, same mesh
+      if (frustums.imesh && frustums.imesh.pose==pose) {
+        frustums.imesh.fadeIn();
+        return;
+      }
+
+      // wait for frustums geometry
+      if (!frustums.mesh) {
+        clearTimeout(frustums.showImage_timeout);
+        frustums.showImage_timeout=setTimeout(function(){
+          frustums.showImage(pose);
+        },150);
+        return;
+      }
+
+      // create mesh for frustum image
+      var THREE=viewer.window.THREE;
+      var geometry=new THREE.PlaneBufferGeometry();
+      var gp=geometry.attributes.position.array;
+
+      // offset of first vertex index in fp
+      var offset=pose*18+12;
+      var fp=frustums.mesh.geometry.attributes.position.array;
+      var vertex_index=frustums.mesh.geometry.attributes.index.array;
+
+      var position_index=vertex_index[offset]*3;
+      gp[0]=fp[position_index];
+      gp[1]=fp[position_index+1];
+      gp[2]=fp[position_index+2];
+
+      position_index=vertex_index[offset+3]*3;
+      gp[3]=fp[position_index];
+      gp[4]=fp[position_index+1];
+      gp[5]=fp[position_index+2];
+
+      position_index=vertex_index[offset+4]*3;
+      gp[6]=fp[position_index];
+      gp[7]=fp[position_index+1];
+      gp[8]=fp[position_index+2];
+
+      position_index=vertex_index[offset+2]*3;
+      gp[9]=fp[position_index];
+      gp[10]=fp[position_index+1];
+      gp[11]=fp[position_index+2];
+
+
+      var texture=THREE.ImageUtils.loadTexture(
+        document.location.pathname.replace(/[^\/]+$/,'')+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
+        THREE.UVMapping,
+        null,
+        function texture_onerror() {
+          console.log(arguments);
+          alert('Could not load undistorted pose image');
+        }
+      );
+
+      texture.minFilter=THREE.LinearFilter
+
+      var material=new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+        depthTest: false,
+        depthWrite: false,
+        transparent: true,
+        opacity: 0
+      });
+
+      material.needsUpdate=true;
+
+      frustums.imesh=new THREE.Mesh(geometry, material);
+      frustums.imesh.pose=pose;
+
+      viewer.window.fruscene.add(frustums.imesh);
+
+      frustums.imesh.fadeIn=function fadeIn(callback) {
+        function _fadeIn() {
+          material.opacity+=1/frustums.fadeInSteps;
+          if (material.opacity>=1) {
+            material.opacity=1;
+            if (callback) {
+              callback();
+            }
+            return;
+          }
+          requestAnimationFrame(_fadeIn);
+        }
+        _fadeIn();
+
+      } // frustums.imesh.fadeIn
+
+      frustums.imesh.fadeOut=function fadeOut(callback) {
+        function _fadeOut() {
+          material.opacity-=1/frustums.fadeOutSteps;
+          if (material.opacity<=0) {
+            material.opacity=0;
+            if (callback) {
+              callback();
+            }
+            return;
+          }
+          requestAnimationFrame(_fadeOut);
+        }
+        _fadeOut();
+
+      } // frustums.imesh.fadeOut
+
+      frustums.imesh.fadeIn();
+
+    }, // frustums.showImage
+/*
+    showImage: function frustums_showImage(pose) {
+      var THREE=viewer.window.THREE;
+      var geometry=new THREE.Geometry();
+      var v=new THREE.Vector3();
+      var p=frustums.mesh.geometry.attributes.position.array;
+      var vertex_index=frustums.mesh.geometry.attributes.index.array;
+
+      // offset of first vertex index in attributes.index.array
+      var offset=pose*18+12;
+      var c;
+
+      for (var i=0; i<6 ; ++i) {
+        var position_index=vertex_index[offset+i]*3;
+        console.log(position_index);
+        geometry.vertices.push(v.set(p[position_index],p[position_index+1],p[position_index+2]));
+        console.log(v);
+      }
+
+      geometry.faces.push(new THREE.Face3(0,1,2));
+      geometry.faces.push(new THREE.Face3(3,4,5));
+
+      geometry.faceVertexUvs[0]=[
+        [
+          new THREE.Vector2(0,1),
+          new THREE.Vector2(0,0),
+          new THREE.Vector2(1,1)
+        ],
+
+        [
+          new THREE.Vector2(0,0),
+          new THREE.Vector2(1,0),
+          new THREE.Vector2(1,1)
+        ]
+      ];
+
+      geometry.verticesNeedUpdate=true;
+      geometry.uvsNeedUpdate=true;
+      geometry.computeBoundingSphere();
+      geometry.computeFaceNormals();
+      geometry.computeVertexNormals();
+
+      var texture=THREE.ImageUtils.loadTexture(
+        document.location.pathname.replace(/[^\/]+$/,'')+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
+        THREE.UVMapping,
+        function texture_onload() {
+          console.log('texture_onload',arguments);
+        },
+        function texture_onerror() {
+          console.log(arguments);
+          alert('Could not load undistorted pose image');
+        }
+      );
+      texture.minFilter=THREE.LinearFilter
+
+      var material=new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.DoubleSide
+      });
+
+      material.needsUpdate=true;
+
+      frustums.imesh=new THREE.Mesh(geometry, material);
+
+
+      viewer.window.scene.add(frustums.imesh);
+
+    } // frustums.showImage
+*/
 
 } // frustums
