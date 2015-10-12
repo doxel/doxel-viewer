@@ -65,12 +65,12 @@ $(document).ready(function(){
     }
 
     // replace in two steps for backward directory naming compatibility
-    src=src.replace(/\/viewer$/,'');
+    src=src.replace(/\/viewer\/?$/,'');
 
     // get window location directory
     var pathname=document.location.pathname.replace(/[^\/]+.html$/,'');
     // replace in two steps for backward directory naming compatibility
-    pathname=pathname.replace(/\/viewer$/,'');
+    pathname=pathname.replace(/\/viewer\/?$/,'');
 
     // override predefined segmentURL with src or referrer
     if (pathname!=src) {
@@ -1261,6 +1261,11 @@ var viewer={
       if (!viewer.mode.scrolling) {
         // get/update relative coordinates before scrolling
         var rel=viewer.relativeCameraCoordinates();
+
+	if (frustums.imesh) {
+          frustums.imesh.fadeOut();
+        }
+
         viewer.mode.scrolling=true;
       }
 
