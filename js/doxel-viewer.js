@@ -64,8 +64,13 @@ $(document).ready(function(){
       src=src.substring(window.location.origin.length);
     }
 
+    // replace in two steps for backward directory naming compatibility
+    src=src.replace(/\/viewer$/,'');
+
     // get window location directory
     var pathname=document.location.pathname.replace(/[^\/]+.html$/,'');
+    // replace in two steps for backward directory naming compatibility
+    pathname=pathname.replace(/\/viewer$/,'');
 
     // override predefined segmentURL with src or referrer
     if (pathname!=src) {
@@ -97,7 +102,7 @@ $(document).ready(function(){
 
     // initialize doxel-viewer
     $.ajax({
-      url: viewer.segmentURL+'/viewer.json',
+      url: viewer.segmentURL+'/viewer/viewer.json',
       success: function(json) {
         viewer.data=json;
         viewer.init();
@@ -216,7 +221,7 @@ var viewer={
 
           thumbs.push({
             view: view,
-            url: viewer.segmentURL+'/'+view.value.ptr_wrapper.data.filename,
+            url: viewer.segmentURL+'/original_images/'+view.value.ptr_wrapper.data.filename,
             metadata_size: view.value.ptr_wrapper.data.metadata_size||viewer.metadata_size
           });
 
@@ -245,7 +250,7 @@ var viewer={
 
         // load jpeg metadata array
         $.ajax({
-          url: viewer.segmentURL+'/jpeg_metadata.bin',
+          url: viewer.segmentURL+'/viewer/jpeg_metadata.bin',
           dataType: 'native',
           xhrFields: {
             responseType: 'blob',
@@ -292,7 +297,7 @@ var viewer={
       viewer.jpeg_index=null;
 
       $.ajax({
-        url: viewer.segmentURL+'/jpeg_metadata_index.bin',
+        url: viewer.segmentURL+'/viewer/jpeg_metadata_index.bin',
         dataType: 'native',
         xhrFields: {
           responseType: 'arraybuffer',
@@ -1412,7 +1417,7 @@ var frustums={
     */
     load: function frustums_load(callback) {
       $.ajax({
-        url: viewer.segmentURL+'/'+frustums.url,
+        url: viewer.segmentURL+'/viewer/'+frustums.url,
         dataType: 'text',
         success: callback,
         error: function() {
