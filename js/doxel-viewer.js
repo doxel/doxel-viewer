@@ -48,7 +48,7 @@ function getParam(name) {
   return (index<0)?undefined:decodeURIComponent(list[index+1]);
 }
 
-$(document).ready(function(){
+  $(document).ready(function(){
 
     // read src query parameter
     var src=getParam('src');
@@ -92,12 +92,7 @@ $(document).ready(function(){
 
     // load potree viewer
     $('iframe')
-    .on('load',function(){
-      // warning: load event could be fired only one time per iframe
-      viewer.window=this.contentWindow;
-      frustums.init(viewer.window);
-      viewer.showFirstPose();
-    })
+    .on('load',iframe.onload)
     .attr('src',viewer.segmentURL+'/potree');
 
     // initialize doxel-viewer
@@ -615,14 +610,6 @@ var viewer={
       }
 
       var _window=viewer.window;
-
-      if (!_window || !_window.camera) {
-        clearTimeout(viewer.showPoseTimeout);
-        viewer.showPoseTimeout=setTimeout(function(){
-          viewer.showPose(options);
-        },150);
-        return;
-      }
       var camera=_window.camera;
 
       var poseIndex=options.pose;
@@ -931,15 +918,6 @@ var viewer={
     */
     goto: function viewer_goto(options) {
       var _window=viewer.window;
-
-      if (!_window || !_window.camera) {
-        clearTimeout(viewer.gotoTimeout);
-        viewer.gotoTimeout=setTimeout(function(){
-          viewer.goto(options);
-        },150);
-        return;
-      }
-
       var camera=_window.camera;
       var THREE=_window.THREE;
 
@@ -1011,15 +989,6 @@ var viewer={
     moveCamera: function viewer_moveCamera(options){
 
       var _window=viewer.window;
-
-      if (!_window || !_window.camera) {
-        clearTimeout(viewer.moveCameraTimeout);
-        viewer.moveCameraTimeout=setTimeout(function(){
-          viewer.moveCamera(options);
-        },150);
-        return;
-      }
-
       var camera=_window.camera;
       var THREE=_window.THREE;
 
@@ -1412,9 +1381,10 @@ var frustums={
       frustums.load(function(ply){
         frustums.parse_ply(window,ply);
         frustums.addToScene();
+        frustums.setupEventHandlers();
+        $(frustums).trigger('load');
       });
 
-      frustums.setupEventHandlers();
 
     }, //  frustums.init
 
@@ -1588,6 +1558,9 @@ var frustums={
     * @method frustums.hide
     */
     hide: function frustums_hide() {
+      if (!frustums.mesh) {
+        return;
+      }
       frustums.mesh.visible=frustums.mode.always;
       if (!frustums.mesh.visible && frustums.imesh) {
         frustums.imesh.fadeOut();
@@ -1786,3 +1759,34 @@ var frustums={
 */
 
 } // frustums
+
+/**
+* @object iframe
+*/
+var iframe={
+
+  /**
+  * @method iframe.onload
+  */
+  onload: function iframe_onload(){
+    var iframe=this;
+    var window=iframe.contentWindow;
+
+    if (!window.camera || !window.scene || !window.controls) {
+      console.log(window);
+      clearTimeout(iframe.onload_timeout);
+      iframe.onload_timeout=setTimeout(function(){
+        iframe_onload.call(iframe);
+      },150);
+      return;
+    }
+
+    viewer.window=window;
+    $(frustums).on('load',function(){
+      viewer.showFirstPose();
+    });
+    frustums.init(viewer.window);
+
+  } // iframe.onload
+
+} // iframe
