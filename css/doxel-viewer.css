@@ -140,3 +140,7 @@ div#mapwrap.visible {
   visibility: visible;
 }
 
+.disabled #thumbnails, .disabled #mapwrap, .disabled#iframe {
+  pointer-events: none;
+}
+

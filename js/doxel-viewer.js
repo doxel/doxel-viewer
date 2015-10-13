@@ -126,6 +126,11 @@ function getParam(name) {
 */
 var viewer={
     /**
+    * @property viewer.container
+    */
+    container: 'body',
+
+    /**
     * @property viewer.metadata_size
     *
     * default range to search for jpeg metadata
@@ -1783,6 +1788,7 @@ var iframe={
 
     viewer.window=window;
     $(frustums).on('load',function(){
+      $(viewer.container).removeClass('disabled');
       viewer.showFirstPose();
     });
     frustums.init(viewer.window);
