@@ -143,6 +143,11 @@ var viewer={
     posesOnly: true,
 
     /**
+    * @property viewer.autoPlay
+    */
+    autoPlay: false,
+
+    /**
     * @property viewer.pose
     *
     * last pose displayed
@@ -533,7 +538,13 @@ var viewer={
     * @method viewer.setupEventHandlers
     */
     setupEventHandlers: function viewer_setupEventHandlers() {
-        $('#thumbnails').on('load',viewer.play);
+
+        if (viewer.autoPlay) {
+          $('#thumbnails').on('load',function(){
+            frustums.hide();
+            viewer.play();
+          });
+        }
 
         // thumbnail onclick
         $("#thumbnails").on("click","a", viewer.thumbnail_onclick);
