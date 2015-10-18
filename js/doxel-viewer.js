@@ -1162,7 +1162,6 @@ var viewer={
     * @method viewer.play
     */
     play: function viewer_play() {
-      return;
       var i=0;
       var incr;
       var _window=viewer.window;
