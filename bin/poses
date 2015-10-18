@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+// fix head or tail lol
+process.stdout.on('error',function(err){
+  if (err.code==='EPIPE') return;
+});
+
+var json=require(process.argv[2]);
+var filename=[];
+json.views.forEach(function(view){
+  filename.push(view.value.ptr_wrapper.data.filename);
+});
+  
+json.extrinsics.forEach(function(extrinsics){
+  console.log(filename[extrinsics.key]);
+});
+  

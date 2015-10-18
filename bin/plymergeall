@@ -1,0 +1,29 @@
+#!/bin/bash
+
+CLOUDCOMPARE=$(which CloudCompare)
+[ -z "$CLOUDCOMPARE" ] && CLOUDCOMPARE=/data/src/cloudcompare/build-ubuntu/qCC/CloudCompare
+
+set -v
+set -e
+
+if stat PMVS/models/option-0000_MERGED*ply >/dev/null 2>&1 ; then 
+  echo "plys already merged"
+  exit
+fi
+
+# only one file, exit
+if ! stat PMVS/models/option-0001.ply >/dev/null 2>&1 ; then
+  exit
+fi
+
+get_plys() {
+  TEMP=$(mktemp)
+  ls -1 PMVS/models/option-????.ply | sort > $TEMP
+  while read ply ; do 
+    echo -n "-O $ply "
+  done < $TEMP
+  rm $TEMP
+}
+
+# must use the full path to run CC !
+env DISPLAY=:0 $CLOUDCOMPARE -SILENT -C_EXPORT_FMT PLY -PLY_EXPORT_FMT ASCII $(get_plys) -MERGE_CLOUDS || exit 1

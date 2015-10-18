@@ -1,0 +1,49 @@
+#!/bin/bash
+TEMP=$(mktemp)
+DIR=$1
+[ -z "$DIR" ] && DIR=$PWD
+
+echo '{"coords": [' > $TEMP
+
+while read f ; do
+  GPS=$(exiftool  -p '$gpslatitude $gpslongitude' -c '%d %d %.8f' $DIR/$f)
+  #53 1 57.00000000 N 13 18 22.00000000 E
+  [ -n "$GPS" ] && echo $koma"\"$GPS\"" >> $TEMP && koma=","
+done
+echo ']}' >> $TEMP
+
+mv $TEMP $TEMP.json
+
+getavgcoords() {
+
+node << EOF
+
+var json=require("$TEMP.json");
+var lon=0;
+var lat=0;
+json.coords.forEach(function(coords){
+  var c=coords.split(' ');
+  lat+=parseInt(c[0])+parseInt(c[1])/60+parseFloat(c[2])/3600*(c[3]=='S'?-1:1);
+  if (c[3]=='S') lat=-lat;
+  lon+=parseInt(c[4])+parseInt(c[5])/60+parseFloat(c[6])/3600*(c[7]=='W'?-1:1);
+});
+
+console.log('lat='+(lat/json.coords.length)+'&lon='+(lon/json.coords.length));
+EOF
+
+}
+
+sleep 2
+wget "http://nominatim.openstreetmap.org/reverse?format=json&$(getavgcoords)&zoom=18&addressdetails=1" -O nominatim.json
+
+#node << EOF
+#var json=require("$TEMP.json");
+#console.log(json.display_name);
+#EOF
+
+rm $TEMP.json
+
+
+  
+
+

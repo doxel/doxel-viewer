@@ -1,0 +1,72 @@
+#!/bin/sh
+
+DOCROOT=/var/www
+WEBROOT=doxel-viewer
+
+#set -x
+get_displayName() {
+  [ -f $segment/nominatim.json ] || return
+node << EOF
+var json=require("/$segment/nominatim.json");
+if (json.display_name) {
+  console.log(json.display_name);
+}
+EOF
+}
+
+
+{
+
+cat << 'EOF'
+<DOCTYPE !html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      div {
+         background-size: cover;
+         width: 192px;
+         height: 144px;
+         float: left;
+         margin: 2px;
+      }
+    </style>
+  </head>
+  <body>
+EOF
+
+# create the thumbnail directory if needed
+THUMB_DIR=$DOCROOT/$WEBROOT/thumbs
+mkdir $THUMB_DIR -p || exit
+
+cd $DOCROOT/$WEBROOT
+
+# for each viewer directory
+find upload/ -type d -name viewer | sort | while read d ; do
+
+  # get segment directory
+  segment=$(dirname $d)
+
+  # get the 4th image filename
+  jpeg=$(poses /$segment/viewer/viewer.json | head -n 4 | tail -n 1)
+  if [ -z "$jpeg" ] ; then
+    echo Error: cannot get extract first image name for $segment >&2
+    continue
+  fi
+
+  # create thumbnail if needed
+  thumb=$THUMB_DIR/$(basename $jpeg)
+  [ -f $thumb ] || convert -resize 192x $segment/original_images/$jpeg $thumb
+  if [ $? -ne 0 ] ; then
+    echo Error: cannot create thumb for $segment >&2
+    continue
+  fi
+  echo "<a href=\"/$WEBROOT/viewer.html?src=$segment\" title=\"$(get_displayName)\" target=\"_viewer\"><div style=\"background-image: url(thumbs/$(basename $jpeg));\"></div></a>"
+done
+
+cat << 'EOF'
+  </body>
+</html>
+EOF
+
+}

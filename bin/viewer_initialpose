@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+
+// read viewer.json
+var json=require(process.argv[2]);
+
+var camera=json.extrinsics[process.argv[3]||0].value;
+
+var up=camera.rotation[1];
+up[0]=-up[0];
+up[1]=-up[1];
+up[2]=-up[2];
+
+var target=camera.rotation[2];
+var center=camera.center;
+target[0]+=center[0];
+target[1]+=center[1];
+target[2]+=center[2];
+
+console.log('sceneProperties.cameraPosition=',camera.center,';');
+console.log('sceneProperties.cameraTarget=',camera.rotation[2],';');
+console.log('sceneProperties.cameraUp=',camera.rotation[1],';');

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DOCROOT=/var/www
+WEBROOT=doxel-viewer
+
+echo "you are going to regenerate all the viewers !!!!"
+echo "ctrl-c to abort, enter to continue"
+read
+find  /$DOCROOT/$WEBROOT/upload/ -wholename *PMVS/models\*ply | parallel --gnu dirname | sort -u | while read d ; do d=$(dirname $d) ; d=$(dirname $d); echo $d ; cd $d ; viewer.sh ; done
