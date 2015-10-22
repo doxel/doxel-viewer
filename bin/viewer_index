@@ -42,7 +42,7 @@ mkdir $THUMB_DIR -p || exit
 cd $DOCROOT/$WEBROOT
 
 # for each viewer directory
-find upload/ -type d -name viewer | sort | while read d ; do
+find upload/ -type d -name viewer | sort -r | while read d ; do
 
   # get segment directory
   segment=$(dirname $d)
