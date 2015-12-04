@@ -52,10 +52,8 @@ function getParam(name) {
 
     // read src query parameter
     var src=getParam('src');
-    viewer.segmentURL='upload/2015/09/02/14412040/2f4acd908588c2590ee06cb67187c85b/1441204044_000000';
-    viewer.segmentURL='upload/2015/08/23/14403273/2f4acd908588c2590ee06cb67187c85b/1440327326_000000';
 
-    // use either the specified src, or document.referrer or predefined segmentURL
+    // use either the specified src, or document.referrer or predefined segmentURL (in js/config.js)
     src=src||document.referrer||viewer.segmentURL;
     src=src.replace(/\/[^\/]+.html$/,'');
 
@@ -93,7 +91,7 @@ function getParam(name) {
     // load potree viewer
     $('iframe')
     .on('load',iframe.onload)
-    .attr('src',viewer.segmentURL+'/potree');
+    .attr('src',viewer.segmentURL+'/potree/potree.html');
 
     // initialize doxel-viewer
     $.ajax({

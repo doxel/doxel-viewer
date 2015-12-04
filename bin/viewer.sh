@@ -50,7 +50,7 @@ viewer_initialpose $PWD/viewer/viewer.json >> potree/examples/potree.js
 openMVG_main_ExportCameraFrustums -i openMVG/robust.json -o ./viewer/frustums.ply
 
 # redirect page
-cat > viewer/index.html << EOF
+cat > viewer/viewer.html << EOF
 <!DOCTYPE html>
 <html>
   <head>
