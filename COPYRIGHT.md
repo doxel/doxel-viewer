@@ -59,7 +59,7 @@ This program includes works distributed under the terms of another license(s) an
     Copyright (c) 2014 Manos Malihutsakis, http://manos.malihu.gr<br />
     Malihu custom scrollbar plugin is licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
-*   __Leaflet 0.7.5__<br />
+*   __Leaflet 0.7.7__<br />
     <(http://leafletjs.com)><br />
     Copyright (c) 2010-2014, Vladimir Agafonkin<br />
     Copyright (c) 2010-2011, CloudMade<br />
