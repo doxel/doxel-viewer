@@ -47,11 +47,16 @@ find upload/ -type d -name viewer | sort -r | while read d ; do
   # get segment directory
   segment=$(dirname $d)
 
+  jpeg=$(cat /$segment/viewer/config 2>/dev/null | grep -i THUMB | cut -f 2 -d '=')
+
   # get the 4th image filename
-  jpeg=$(poses /$segment/viewer/viewer.json | head -n 4 | tail -n 1)
-  if [ -z "$jpeg" ] ; then
-    echo Error: cannot get extract first image name for $segment >&2
-    continue
+  if [ ! -f "$jpeg" ] ; then
+    jpeg=$(poses /$segment/viewer/viewer.json | head -n 4 | tail -n 1)
+    if [ -z "$jpeg" ] ; then
+      echo Error: cannot get extract thumb image name for $segment >&2
+      continue
+    fi
+    echo "THUMB=$jpeg" >> /$segment/viewer/config
   fi
 
   # create thumbnail if needed
