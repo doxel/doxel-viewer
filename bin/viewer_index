@@ -55,13 +55,13 @@ find upload/ -type d -name viewer | sort -r | while read d ; do
   fi
 
   # create thumbnail if needed
-  thumb=$THUMB_DIR/$(basename $jpeg)
+  thumb=$THUMB_DIR/$(basename $segment).jpeg # use the segment name instead of the source jpeg name
   [ -f $thumb ] || convert -resize 192x $segment/original_images/$jpeg $thumb
   if [ $? -ne 0 ] ; then
     echo Error: cannot create thumb for $segment >&2
     continue
   fi
-  echo "<a href=\"/$WEBROOT/viewer.html?src=$segment\" title=\"$(get_displayName)\" target=\"_viewer\"><div style=\"background-image: url(thumbs/$(basename $jpeg));\"></div></a>"
+  echo "<a href=\"/$WEBROOT/viewer.html?src=$segment\" title=\"$(get_displayName)\" target=\"_viewer\"><div style=\"background-image: url(thumbs/$(basename $thumb));\"></div></a>"
 done
 
 cat << 'EOF'
