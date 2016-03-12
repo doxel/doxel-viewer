@@ -47,6 +47,8 @@ find upload/ -type d -name viewer | sort -r | while read d ; do
   # get segment directory
   segment=$(dirname $d)
 
+  [ -f "/$segment/exclude" ] && continue
+
   jpeg=$(cat /$segment/viewer/config 2>/dev/null | grep -i THUMB | cut -f 2 -d '=')
 
   # get the 4th image filename
