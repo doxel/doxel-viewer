@@ -62,30 +62,39 @@ function getParam(name) {
       src=src.substring(window.location.origin.length);
     }
 
-    // replace in two steps for backward directory naming compatibility
-    src=src.replace(/\/viewer\/?$/,'');
+    if (src=="/earth/deploy") {
+      // when viewer is instantiated from doxel-angular, exract segmentUrl from pathname
+      var pathname=document.location.pathname.split('/');
+      var segmentId=pathname[2];
+      var timestamp=pathname[3]; 
+      viewer.segmentURL='/viewer/'+segmentId+'/'+timestamp;
 
-    // get window location directory
-    var pathname=document.location.pathname.replace(/[^\/]+.html$/,'');
-    // replace in two steps for backward directory naming compatibility
-    pathname=pathname.replace(/\/viewer\/?$/,'');
+    } else {
+      // replace in two steps for backward directory naming compatibility
+      src=src.replace(/\/viewer\/?$/,'');
 
-    // override predefined segmentURL with src or referrer
-    if (pathname!=src) {
-      viewer.segmentURL=src;
-    }
+      // get window location directory
+      var pathname=document.location.pathname.replace(/[^\/]+.html$/,'');
+      // replace in two steps for backward directory naming compatibility
+      pathname=pathname.replace(/\/viewer\/?$/,'');
 
-    // remove leading window pathname from segment pathname
-    // (get the relative path)
-    if (viewer.segmentURL.substr(0,pathname.length)==pathname) {
-      viewer.segmentURL=viewer.segmentURL.substr(pathname.length);
-    }
+      // override predefined segmentURL with src or referrer
+      if (pathname!=src) {
+        viewer.segmentURL=src;
+      }
 
-    // change url in address bar and push history state
-    if (window.location.search!='?src='+viewer.segmentURL) {
-      History.pushState({
-        src: viewer.segmentURL
-      },null,'?src='+viewer.segmentURL);
+      // remove leading window pathname from segment pathname
+      // (get the relative path)
+      if (viewer.segmentURL.substr(0,pathname.length)==pathname) {
+        viewer.segmentURL=viewer.segmentURL.substr(pathname.length);
+      }
+
+      // change url in address bar and push history state
+      if (window.location.search!='?src='+viewer.segmentURL) {
+        History.pushState({
+          src: viewer.segmentURL
+        },null,'?src='+viewer.segmentURL);
+      }
     }
 
     // load potree viewer
@@ -100,8 +109,9 @@ function getParam(name) {
         viewer.data=json;
         viewer.init();
       },
-      error: function(){
-        console.log('could not load pointcloud metadata');
+      error: function(err){
+        console.log('could not load pointcloud metadata',err);
+        alert(err.statusText || 'Could not load pointcloud');
       }
     });
 
@@ -1646,7 +1656,8 @@ var frustums={
 
 
       var texture=THREE.ImageUtils.loadTexture(
-        document.location.pathname.replace(/[^\/]+$/,'')+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
+        ((viewer.segmentURL.split('/')[1]=='viewer')?'':document.location.pathname.replace(/[^\/]+$/,''))+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
+
         THREE.UVMapping,
         null,
         function texture_onerror() {
