@@ -62,12 +62,12 @@ function getParam(name) {
       src=src.substring(window.location.origin.length);
     }
 
-    if (src=="/earth/deploy") {
-      // when viewer is instantiated from doxel-angular, exract segmentUrl from pathname
-      var pathname=document.location.pathname.split('/');
-      var segmentId=pathname[2];
-      var timestamp=pathname[3]; 
-      viewer.segmentURL='/viewer/'+segmentId+'/'+timestamp;
+    var pathname=document.location.pathname.split('/');
+    if (pathname[1]=='api' && pathname[2]=='segments' && pathname[3]=='viewer') {
+      // when viewer is instantiated through doxel-strongloop api, exract segmentUrl from pathname
+      var segmentId=pathname[4];
+      var timestamp=pathname[5]; 
+      viewer.segmentURL='/api/segments/viewer/'+segmentId+'/'+timestamp;
 
     } else {
       // replace in two steps for backward directory naming compatibility
@@ -1656,7 +1656,7 @@ var frustums={
 
 
       var texture=THREE.ImageUtils.loadTexture(
-        ((viewer.segmentURL.split('/')[1]=='viewer')?'':document.location.pathname.replace(/[^\/]+$/,''))+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
+        ((viewer.segmentURL.split('/')[1]=='api')?'':document.location.pathname.replace(/[^\/]+$/,''))+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
 
         THREE.UVMapping,
         null,
