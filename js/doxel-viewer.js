@@ -195,10 +195,10 @@ var viewer={
 
         // init map
         var map = viewer.map = L.map('map').setView([51.505, -0.09], 13);
-        L.tileLayer('//{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',{
-                  description: 'Mapbox Bright',
-                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
-                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+        L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',  {
+                  description: 'OpenStreetMap Mapnik',
+                    maxZoom: 19,
+                   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
 
         viewer.setupEventHandlers();
