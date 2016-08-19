@@ -1,0 +1,30 @@
+{
+  "name": "doxel-viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doxel/doxel-viewer.git"
+  },
+  "author": "",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/doxel/doxel-viewer/issues"
+  },
+  "homepage": "https://github.com/doxel/doxel-viewer#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-bower": "0.0.13",
+    "gulp-connect": "^5.0.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-ruby-sass": "^2.1.0",
+    "opn": "^4.0.2",
+    "wiredep": "^4.0.0"
+  },
+  "dependencies": {}
+}

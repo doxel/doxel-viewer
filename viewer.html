@@ -2,9 +2,12 @@
 <html>
 
   <head>
-    <link rel="stylesheet" href="css/thirdparty/Font-Awesome/css/font-awesome.css">
     <link rel="stylesheet" href="js/thirdparty/malihu-custom-scrollbar/jquery.mCustomScrollbar.css">
-    <link rel="stylesheet" href="js/thirdparty/leaflet-0.7.7/leaflet.css">
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="bower_components/Leaflet.EasyButton/src/easy-button.css" />
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css" />
+    <!-- endbower -->
 
     <link rel="stylesheet" href="css/doxel-viewer.css">
 
@@ -18,10 +21,88 @@
     <script src="js/thirdparty/blueimp-load-image/js/load-image-exif-map.js"></script>
     <script src="js/thirdparty/malihu-custom-scrollbar/jquery.mCustomScrollbar.js"></script>
     <script src="js/thirdparty/history.js/scripts/bundled-uncompressed/html4+html5/jquery.history.js"></script>
-    <script src="js/thirdparty/leaflet-0.7.7/leaflet-src.js"></script>
+    <!-- bower:js -->
+    <script src="bower_components/leaflet/dist/leaflet-src.js"></script>
+    <script src="bower_components/Leaflet.EasyButton/src/easy-button.js"></script>
+    <!-- endbower -->
 
     <script src="js/doxel-viewer.js"></script>
     <script src="js/config.js"></script>
+
+    <script>
+      $(document).ready(function(){
+        var button=$('a.play');
+        var icon=$('div',button);
+        button.on('click',function(){
+          if (icon.hasClass('fa-play')) {
+            icon.addClass('fa-stop').removeClass('fa-play');
+            button.attr('title','Stop');
+            viewer.play();
+          } else {
+            viewer.mode.play=false;
+          }
+
+        });
+
+        $(viewer).on('stop',function(){
+          icon.addClass('fa-play').removeClass('fa-stop');
+          button.attr('title','Play');
+        });
+
+
+      });
+    </script>
+
+<style>
+
+a.button {
+  box-shadow: 6px 6px 12px rgba(0,0,0,0.4);
+  position: absolute;
+  top: 0;
+  /* left: 0; */
+  color: black;
+  /*margin: 1em;*/
+  border: 1px solid black;
+  border-radius: 0.5em;
+  background-color: rgba(200,200,255,0.6);
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+
+a.button:hover {
+  background-color: rgba(255,255,255,0.7);
+}
+
+a.button:active {
+  box-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+  transform: scale(0.98);
+}
+
+a.button div {
+  position: relative;
+  font-size: 3em;
+  margin: 0.2em;
+}
+
+a.play {
+  top: 154px;
+  left: 10px;
+  width: 4em;
+}
+
+div.fa-play  {
+  padding-left: 0.10em;
+}
+
+div.fa-stop  {
+  padding-left: 0.025em;
+}
+
+
+</style>
+
 
   </head>
 
@@ -33,6 +114,9 @@
     <div id="mapwrap">
     <div id="map"></div>
     </div>
+    <div id="controls">
+     <a class="button play" draggable="false"><div class="fa fa-play" aria-hidden="true"></div></a>
+   </div>
 
   </body>
 

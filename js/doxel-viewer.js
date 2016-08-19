@@ -66,7 +66,7 @@ function getParam(name) {
     if (pathname[1]=='api' && pathname[2]=='segments' && pathname[3]=='viewer') {
       // when viewer is instantiated through doxel-strongloop api, exract segmentUrl from pathname
       var segmentId=pathname[4];
-      var timestamp=pathname[5]; 
+      var timestamp=pathname[5];
       viewer.segmentURL='/api/segments/viewer/'+segmentId+'/'+timestamp;
 
     } else {
@@ -205,11 +205,38 @@ var viewer={
 
         // init map
         var map = viewer.map = L.map('map').setView([51.505, -0.09], 13);
-        L.tileLayer('//{s}.tiles.mapbox.com/v3/dennisl.4e2aab76/{z}/{x}/{y}.png',{
-                  description: 'Mapbox Bright',
-                  attribution: '&copy; <a href="https://www.mapbox.com/about/maps">Mapbox</a>, '
-                                  + '<a href="http://openstreetmap.org/copyright">OpenStreetMap</a>'
+        var blueMarble=L.tileLayer('https://doxel.org/doxel-viewer/upload/blue-marble/{z}/{x}/{y}.jpg',{
+          attribution: '<a href="http://visibleearth.nasa.gov/">NASA</a>',
+          tilesize: 256,
+          tms: true
         }).addTo(map);
+
+        var toner = L.tileLayer('https://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+          attribution: '<a href="https://www.stamen.com">Stamen Design</a>',
+          opacity:0
+        });
+        toner.addTo(map);
+
+        var osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+              attribution: '<a href="https://www.openstreetmap.org/copyright">OSM</a>',
+             subdomains: ['a','b','c'],
+             opacity: 0
+
+        });
+        osm.addTo(map);
+
+        var prevZoom;
+        setInterval(function(){
+          var newZoom=map.getZoom();
+          if (newZoom!=prevZoom) {
+            prevZoom=newZoom;
+            osm.setOpacity(newZoom<9?0:Math.min(1,Math.max((newZoom-9)/4,0.2)));
+            toner.setOpacity(newZoom>9?0:0.2);
+            blueMarble.setOpacity(newZoom>13?0:1);
+          }
+        },300);
+
+
 
         viewer.setupEventHandlers();
 
@@ -599,6 +626,7 @@ var viewer={
         viewer.showPose({
           pose: pose,
           callback: function(){
+            viewer._pose=pose;
             if (!viewer.rel_active) {
               frustums.showImage(pose);
             }
@@ -687,6 +715,19 @@ var viewer={
     * @method viewer.relativeCameraCoordinates
     *
     * Save/Load/Toggle/Return relative camera coordinates
+    *
+    * The viewer only know which pose should be displayed right now,
+    * the camera is moved by the potree viewer controls.
+    *
+    * Then the difference between the target pose position/rotation and
+    * the camera position/rotation, if any, is the relative t/R
+    * returned by getRelativeCameraExtrinsics() that will be used
+    * by applyCameraRelativeSettings() to update the camera
+    * position/rotation for the target pose.
+    *
+    * TODO: handle the case of the play button, when retarting from the first
+    * pose (the relative translation/rotation must not change, even if the camera
+    * is at the last pose))
     *
     * @param {Number} [pose] Used to toggle back to original coordinates
     * @return {Object} [rel] The relative camera coordinates
@@ -1188,7 +1229,13 @@ var viewer={
     * @method viewer.play
     */
     play: function viewer_play() {
-      var i=0;
+      var i;
+      if (viewer.pose!=viewer.data.extrinsics.length-1) {
+        i=Number(viewer._pose)||0;
+      } else {
+        viewer._pose=0;
+        i=0;
+      }
       var incr;
       var _window=viewer.window;
 
@@ -1231,6 +1278,7 @@ var viewer={
         }
 
         $(viewer).trigger('showpose',[i]);
+        viewer._pose=i;
 
         // on last frame
         if (i+1==viewer.data.extrinsics.length) {
@@ -1240,10 +1288,12 @@ var viewer={
           } else {
             // or stop
             viewer.mode.play=false;
+
           }
         }
       }
 
+      frustums.hide();
       viewer.mode.play=true;
       viewer.mode.goto=false;
       showNextPose();
@@ -1261,7 +1311,7 @@ var viewer={
         // get/update relative coordinates before scrolling
         var rel=viewer.relativeCameraCoordinates();
 
-	if (frustums.imesh) {
+	      if (frustums.imesh) {
           frustums.imesh.fadeOut();
         }
 

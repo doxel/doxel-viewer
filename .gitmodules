@@ -1,9 +1,6 @@
 [submodule "js/thirdparty/blueimp-load-image"]
 	path = js/thirdparty/blueimp-load-image
 	url = https://github.com/blueimp/JavaScript-Load-Image
-[submodule "css/thirdparty/Font-Awesome"]
-	path = css/thirdparty/Font-Awesome
-	url = https://github.com/FortAwesome/Font-Awesome.git
 [submodule "js/thirdparty/history.js"]
 	path = js/thirdparty/history.js
 	url = https://github.com/browserstate/history.js
