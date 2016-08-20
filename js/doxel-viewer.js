@@ -723,11 +723,7 @@ var viewer={
     * the camera position/rotation, if any, is the relative t/R
     * returned by getRelativeCameraExtrinsics() that will be used
     * by applyCameraRelativeSettings() to update the camera
-    * position/rotation for the target pose.
-    *
-    * TODO: handle the case of the play button, when retarting from the first
-    * pose (the relative translation/rotation must not change, even if the camera
-    * is at the last pose))
+    * position/rotation for the target pose...
     *
     * @param {Number} [pose] Used to toggle back to original coordinates
     * @return {Object} [rel] The relative camera coordinates
@@ -735,6 +731,16 @@ var viewer={
     relativeCameraCoordinates: function viewer_relativeCameraCoordinates(pose) {
 
       var result=viewer.zorel;
+
+      if (viewer._lockRelativeCameraExtrinsics) {
+        // dont update relative camera Rt when entering play mode from
+        // the last pose (and jumping to the first pose)
+        viewer._lockRelativeCameraExtrinsics=false;
+        if (viewer.rel_active) {
+          return viewer._rel;
+        }
+
+      } else {
 
       var _rel=viewer.getRelativeCameraExtrinsics();
       var poseChanged=(viewer.pose!=pose);
@@ -777,6 +783,8 @@ var viewer={
           viewer.rel=_rel;
           viewer.rel_active=true;
         }
+      }
+
       }
 
       if (poseChanged) {
@@ -1234,6 +1242,7 @@ var viewer={
         i=Number(viewer._pose)||0;
       } else {
         viewer._pose=0;
+        viewer._lockRelativeCameraExtrinsics=true;
         i=0;
       }
       var incr;
