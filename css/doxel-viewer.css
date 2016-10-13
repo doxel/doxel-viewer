@@ -137,10 +137,20 @@ div#map {
 }
 
 div#mapwrap.visible {
-  visibility: visible;
+  visibility: hidden;
+
 }
+
+@media screen and (min-width: 768px) and (min-height: 455px) {
+  div#mapwrap.visible {
+    visibility: visible;
+  }
+}
+
 
 .disabled #thumbnails, .disabled #mapwrap, .disabled#iframe {
   pointer-events: none;
 }
+
+
 
