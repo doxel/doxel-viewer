@@ -8,7 +8,7 @@ html, body {
   padding: 0;
 }
 
-body {
+html, body {
   overflow: hidden;
 }
 
@@ -28,6 +28,15 @@ body {
   -webkit-touch-callout: all; /* Disable Android and iOS callouts*/
 }
 
+#thumbnails {
+  display: none;
+}
+
+@media screen and (min-height: 480px) and (min-width: 480px) {
+  #thumbnails {
+    display: block;
+  }
+}
 
 #thumbnails {
   z-index: 2;
@@ -151,6 +160,3 @@ div#mapwrap.visible {
 .disabled #thumbnails, .disabled #mapwrap, .disabled#iframe {
   pointer-events: none;
 }
-
-
-

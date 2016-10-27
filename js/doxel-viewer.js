@@ -143,7 +143,7 @@ var viewer={
     *
     * default segment URL (can be set in js/config.js)
     */
-    segmentURL: 'upload/2015/11/25/14484684/dda90fe50f4d06cbc627799a2ec907da/1448468454_000000',
+  //  segmentURL: 'upload/2015/11/25/14484684/dda90fe50f4d06cbc627799a2ec907da/1448468454_000000',
 
     /**
     * @property viewer.metadata_size
@@ -205,39 +205,41 @@ var viewer={
 
         // init map
         var map = viewer.map = L.map('map').setView([51.505, -0.09], 13);
-        var blueMarble=L.tileLayer('https://doxel.org/doxel-viewer/upload/blue-marble/{z}/{x}/{y}.jpg',{
+        var blueMarble=L.tileLayer('/blue-marble/{z}/{x}/{y}.png',{
           attribution: '<a href="http://visibleearth.nasa.gov/">NASA</a>',
           tilesize: 256,
-          tms: true
+          tms: true,
+          maxZoom: 8
         }).addTo(map);
 
-        var toner = L.tileLayer('https://tile.stamen.com/toner/{z}/{x}/{y}.png', {
+        var toner = L.tileLayer('/stamen/toner/{z}/{x}/{y}.png', {
           attribution: '<a href="https://www.stamen.com">Stamen Design</a>',
-          opacity:0
+          opacity: 0.2,
+          maxZoom: 8
+
         });
         toner.addTo(map);
 
-        var osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        var osm=L.tileLayer('/osm/{z}/{x}/{y}.png',{
               attribution: '<a href="https://www.openstreetmap.org/copyright">OSM</a>',
              subdomains: ['a','b','c'],
-             opacity: 0
-
+             opacity: 1,
+             minZoom: 8
         });
         osm.addTo(map);
 
+/*
         var prevZoom;
         setInterval(function(){
           var newZoom=map.getZoom();
           if (newZoom!=prevZoom) {
             prevZoom=newZoom;
-            osm.setOpacity(newZoom<9?0:Math.min(1,Math.max((newZoom-9)/4,0.2)));
-            toner.setOpacity(newZoom>9?0:0.2);
-            blueMarble.setOpacity(newZoom>13?0:1);
+            osm.setOpacity(newZoom<8?0:Math.min(1,Math.max((newZoom-8)/4,0.2)));
+            toner.setOpacity(newZoom>8?0:0.2);
+            blueMarble.setOpacity(newZoom>9?0:1);
           }
         },300);
-
-
-
+*/
         viewer.setupEventHandlers();
 
     }, // viewer.init
