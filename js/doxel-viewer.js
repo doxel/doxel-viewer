@@ -1542,7 +1542,7 @@ var frustums={
       // init geometry
       var geometry=new THREE.BufferGeometry();
       geometry.addAttribute('position', new THREE.BufferAttribute(frustums.position,3));
-      geometry.addAttribute('index', new THREE.BufferAttribute(frustums.index,3));
+      geometry.setIndex(new THREE.BufferAttribute(frustums.index,3));
 
       // init material
       var material=new THREE.MeshBasicMaterial({
@@ -1638,10 +1638,10 @@ var frustums={
 
       if (pose!=undefined) {
         // add pose to draw list
-        frustums.mesh.geometry.addDrawCall(pose*18,18,0);
+        frustums.mesh.geometry.setDrawRange(pose*18,12); // addDrawCall(pose*18,18,0);
       } else {
         // draw all
-        frustums.mesh.geometry.drawcalls.splice(0,frustums.mesh.geometry.drawcalls.length)
+        frustums.mesh.geometry.setDrawRange(0,frustums.vertex_count);//drawcalls.splice(0,frustums.mesh.geometry.drawcalls.length)
       }
     }, // frustums.show
 
@@ -1662,7 +1662,7 @@ var frustums={
     * @method frustums.changeTo
     */
     changeTo: function frustums_changeTo(pose) {
-      frustums.mesh.geometry.drawcalls[0].start=Math.floor(pose)*18;
+      frustums.mesh.geometry.setDrawRange(Math.floor(pose)*18,12);
     }, // frustums.changeTo
 
     /**
@@ -1693,7 +1693,7 @@ var frustums={
       // offset of first vertex index in fp
       var offset=pose*18+12;
       var fp=frustums.mesh.geometry.attributes.position.array;
-      var vertex_index=frustums.mesh.geometry.attributes.index.array;
+      var vertex_index=frustums.mesh.geometry.index.array;
 
       var position_index=vertex_index[offset]*3;
       gp[0]=fp[position_index];
@@ -1720,7 +1720,7 @@ var frustums={
         ((viewer.segmentURL.split('/')[1]=='api')?'':document.location.pathname.replace(/[^\/]+$/,''))+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
 
         THREE.UVMapping,
-        null,
+        undefined,
         function texture_onerror() {
           console.log(arguments);
           alert('Could not load undistorted pose image');
