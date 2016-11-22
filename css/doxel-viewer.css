@@ -134,12 +134,13 @@ div#mapwrap {
   visibility: hidden;
   position: absolute;
   bottom: 16px;
-  left: 16px;
+  right: 16px;
   height: 192px;
   width: 256px;
   background-color: white;
   z-index: 4;
 }
+
 
 div#map {
   height: 192px;
