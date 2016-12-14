@@ -1,0 +1,3001 @@
+{
+    "sfm_data_version": "0.2",
+    "root_path": "pictures",
+    "views": [
+        {
+            "key": 0,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483649,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03770.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 0,
+                        "id_intrinsic": 0,
+                        "id_pose": 0
+                    }
+                }
+            }
+        },
+        {
+            "key": 1,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483650,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03771.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 1,
+                        "id_intrinsic": 0,
+                        "id_pose": 1
+                    }
+                }
+            }
+        },
+        {
+            "key": 2,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483651,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03772.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 2,
+                        "id_intrinsic": 0,
+                        "id_pose": 2
+                    }
+                }
+            }
+        },
+        {
+            "key": 3,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483652,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03773.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 3,
+                        "id_intrinsic": 0,
+                        "id_pose": 3
+                    }
+                }
+            }
+        },
+        {
+            "key": 4,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483653,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03774.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 4,
+                        "id_intrinsic": 0,
+                        "id_pose": 4
+                    }
+                }
+            }
+        },
+        {
+            "key": 5,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483654,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03775.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 5,
+                        "id_intrinsic": 0,
+                        "id_pose": 5
+                    }
+                }
+            }
+        },
+        {
+            "key": 6,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483655,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03776.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 6,
+                        "id_intrinsic": 0,
+                        "id_pose": 6
+                    }
+                }
+            }
+        },
+        {
+            "key": 7,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483656,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03777.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 7,
+                        "id_intrinsic": 0,
+                        "id_pose": 7
+                    }
+                }
+            }
+        },
+        {
+            "key": 8,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483657,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03778.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 8,
+                        "id_intrinsic": 0,
+                        "id_pose": 8
+                    }
+                }
+            }
+        },
+        {
+            "key": 9,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483658,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03779.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 9,
+                        "id_intrinsic": 0,
+                        "id_pose": 9
+                    }
+                }
+            }
+        },
+        {
+            "key": 10,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483659,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03780.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 10,
+                        "id_intrinsic": 0,
+                        "id_pose": 10
+                    }
+                }
+            }
+        },
+        {
+            "key": 11,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483660,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03781.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 11,
+                        "id_intrinsic": 0,
+                        "id_pose": 11
+                    }
+                }
+            }
+        },
+        {
+            "key": 12,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483661,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03782.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 12,
+                        "id_intrinsic": 0,
+                        "id_pose": 12
+                    }
+                }
+            }
+        },
+        {
+            "key": 13,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483662,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03783.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 13,
+                        "id_intrinsic": 0,
+                        "id_pose": 13
+                    }
+                }
+            }
+        },
+        {
+            "key": 14,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483663,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03784.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 14,
+                        "id_intrinsic": 0,
+                        "id_pose": 14
+                    }
+                }
+            }
+        },
+        {
+            "key": 15,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483664,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03785.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 15,
+                        "id_intrinsic": 0,
+                        "id_pose": 15
+                    }
+                }
+            }
+        },
+        {
+            "key": 16,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483665,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03786.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 16,
+                        "id_intrinsic": 0,
+                        "id_pose": 16
+                    }
+                }
+            }
+        },
+        {
+            "key": 17,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483666,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03787.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 17,
+                        "id_intrinsic": 0,
+                        "id_pose": 17
+                    }
+                }
+            }
+        },
+        {
+            "key": 18,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483667,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03788.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 18,
+                        "id_intrinsic": 0,
+                        "id_pose": 18
+                    }
+                }
+            }
+        },
+        {
+            "key": 19,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483668,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03789.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 19,
+                        "id_intrinsic": 0,
+                        "id_pose": 19
+                    }
+                }
+            }
+        },
+        {
+            "key": 20,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483669,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03790.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 20,
+                        "id_intrinsic": 0,
+                        "id_pose": 20
+                    }
+                }
+            }
+        },
+        {
+            "key": 21,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483670,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03791.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 21,
+                        "id_intrinsic": 0,
+                        "id_pose": 21
+                    }
+                }
+            }
+        },
+        {
+            "key": 22,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483671,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03792.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 22,
+                        "id_intrinsic": 0,
+                        "id_pose": 22
+                    }
+                }
+            }
+        },
+        {
+            "key": 23,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483672,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03793.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 23,
+                        "id_intrinsic": 0,
+                        "id_pose": 23
+                    }
+                }
+            }
+        },
+        {
+            "key": 24,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483673,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03794.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 24,
+                        "id_intrinsic": 0,
+                        "id_pose": 24
+                    }
+                }
+            }
+        },
+        {
+            "key": 25,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483674,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03795.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 25,
+                        "id_intrinsic": 0,
+                        "id_pose": 25
+                    }
+                }
+            }
+        },
+        {
+            "key": 26,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483675,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03796.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 26,
+                        "id_intrinsic": 0,
+                        "id_pose": 26
+                    }
+                }
+            }
+        },
+        {
+            "key": 27,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483676,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03797.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 27,
+                        "id_intrinsic": 0,
+                        "id_pose": 27
+                    }
+                }
+            }
+        },
+        {
+            "key": 28,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483677,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03798.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 28,
+                        "id_intrinsic": 0,
+                        "id_pose": 28
+                    }
+                }
+            }
+        },
+        {
+            "key": 29,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483678,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03799.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 29,
+                        "id_intrinsic": 0,
+                        "id_pose": 29
+                    }
+                }
+            }
+        },
+        {
+            "key": 30,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483679,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03800.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 30,
+                        "id_intrinsic": 0,
+                        "id_pose": 30
+                    }
+                }
+            }
+        },
+        {
+            "key": 31,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483680,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03801.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 31,
+                        "id_intrinsic": 0,
+                        "id_pose": 31
+                    }
+                }
+            }
+        },
+        {
+            "key": 32,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483681,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03802.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 32,
+                        "id_intrinsic": 0,
+                        "id_pose": 32
+                    }
+                }
+            }
+        },
+        {
+            "key": 33,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483682,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03803.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 33,
+                        "id_intrinsic": 0,
+                        "id_pose": 33
+                    }
+                }
+            }
+        },
+        {
+            "key": 34,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483683,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03804.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 34,
+                        "id_intrinsic": 0,
+                        "id_pose": 34
+                    }
+                }
+            }
+        },
+        {
+            "key": 35,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483684,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03805.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 35,
+                        "id_intrinsic": 0,
+                        "id_pose": 35
+                    }
+                }
+            }
+        },
+        {
+            "key": 36,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483685,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03806.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 36,
+                        "id_intrinsic": 0,
+                        "id_pose": 36
+                    }
+                }
+            }
+        },
+        {
+            "key": 37,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483686,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03807.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 37,
+                        "id_intrinsic": 0,
+                        "id_pose": 37
+                    }
+                }
+            }
+        },
+        {
+            "key": 38,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483687,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03808.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 38,
+                        "id_intrinsic": 0,
+                        "id_pose": 38
+                    }
+                }
+            }
+        },
+        {
+            "key": 39,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483688,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03809.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 39,
+                        "id_intrinsic": 0,
+                        "id_pose": 39
+                    }
+                }
+            }
+        },
+        {
+            "key": 40,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483689,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03810.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 40,
+                        "id_intrinsic": 0,
+                        "id_pose": 40
+                    }
+                }
+            }
+        },
+        {
+            "key": 41,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483690,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03811.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 41,
+                        "id_intrinsic": 0,
+                        "id_pose": 41
+                    }
+                }
+            }
+        },
+        {
+            "key": 42,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483691,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03812.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 42,
+                        "id_intrinsic": 0,
+                        "id_pose": 42
+                    }
+                }
+            }
+        },
+        {
+            "key": 43,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483692,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03813.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 43,
+                        "id_intrinsic": 0,
+                        "id_pose": 43
+                    }
+                }
+            }
+        },
+        {
+            "key": 44,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483693,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03814.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 44,
+                        "id_intrinsic": 0,
+                        "id_pose": 44
+                    }
+                }
+            }
+        },
+        {
+            "key": 45,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483694,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03815.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 45,
+                        "id_intrinsic": 0,
+                        "id_pose": 45
+                    }
+                }
+            }
+        },
+        {
+            "key": 46,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483695,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03816.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 46,
+                        "id_intrinsic": 0,
+                        "id_pose": 46
+                    }
+                }
+            }
+        },
+        {
+            "key": 47,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483696,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03817.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 47,
+                        "id_intrinsic": 0,
+                        "id_pose": 47
+                    }
+                }
+            }
+        },
+        {
+            "key": 48,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483697,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03818.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 48,
+                        "id_intrinsic": 0,
+                        "id_pose": 48
+                    }
+                }
+            }
+        },
+        {
+            "key": 49,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483698,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03819.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 49,
+                        "id_intrinsic": 0,
+                        "id_pose": 49
+                    }
+                }
+            }
+        },
+        {
+            "key": 50,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483699,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03820.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 50,
+                        "id_intrinsic": 0,
+                        "id_pose": 50
+                    }
+                }
+            }
+        },
+        {
+            "key": 51,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483700,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03821.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 51,
+                        "id_intrinsic": 0,
+                        "id_pose": 51
+                    }
+                }
+            }
+        },
+        {
+            "key": 52,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483701,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03822.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 52,
+                        "id_intrinsic": 0,
+                        "id_pose": 52
+                    }
+                }
+            }
+        },
+        {
+            "key": 53,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483702,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03823.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 53,
+                        "id_intrinsic": 0,
+                        "id_pose": 53
+                    }
+                }
+            }
+        },
+        {
+            "key": 54,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483703,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03824.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 54,
+                        "id_intrinsic": 0,
+                        "id_pose": 54
+                    }
+                }
+            }
+        },
+        {
+            "key": 55,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483704,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03825.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 55,
+                        "id_intrinsic": 0,
+                        "id_pose": 55
+                    }
+                }
+            }
+        },
+        {
+            "key": 56,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483705,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03826.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 56,
+                        "id_intrinsic": 0,
+                        "id_pose": 56
+                    }
+                }
+            }
+        },
+        {
+            "key": 57,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483706,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03827.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 57,
+                        "id_intrinsic": 0,
+                        "id_pose": 57
+                    }
+                }
+            }
+        },
+        {
+            "key": 58,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483707,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03828.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 58,
+                        "id_intrinsic": 0,
+                        "id_pose": 58
+                    }
+                }
+            }
+        },
+        {
+            "key": 59,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483708,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03829.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 59,
+                        "id_intrinsic": 0,
+                        "id_pose": 59
+                    }
+                }
+            }
+        },
+        {
+            "key": 60,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483709,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03830.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 60,
+                        "id_intrinsic": 0,
+                        "id_pose": 60
+                    }
+                }
+            }
+        },
+        {
+            "key": 61,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483710,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03831.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 61,
+                        "id_intrinsic": 0,
+                        "id_pose": 61
+                    }
+                }
+            }
+        },
+        {
+            "key": 62,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483711,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03832.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 62,
+                        "id_intrinsic": 0,
+                        "id_pose": 62
+                    }
+                }
+            }
+        },
+        {
+            "key": 63,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483712,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03833.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 63,
+                        "id_intrinsic": 0,
+                        "id_pose": 63
+                    }
+                }
+            }
+        },
+        {
+            "key": 64,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483713,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03834.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 64,
+                        "id_intrinsic": 0,
+                        "id_pose": 64
+                    }
+                }
+            }
+        },
+        {
+            "key": 65,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483714,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03835.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 65,
+                        "id_intrinsic": 0,
+                        "id_pose": 65
+                    }
+                }
+            }
+        },
+        {
+            "key": 66,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483715,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03836.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 66,
+                        "id_intrinsic": 0,
+                        "id_pose": 66
+                    }
+                }
+            }
+        },
+        {
+            "key": 67,
+            "value": {
+                "ptr_wrapper": {
+                    "id": 2147483716,
+                    "data": {
+                        "local_path": "/",
+                        "filename": "DSC03837.JPG",
+                        "width": 5184,
+                        "height": 3888,
+                        "id_view": 67,
+                        "id_intrinsic": 0,
+                        "id_pose": 67
+                    }
+                }
+            }
+        }
+    ],
+    "intrinsics": [
+        {
+            "key": 0,
+            "value": {
+                "polymorphic_id": 2147483649,
+                "polymorphic_name": "pinhole_radial_k3",
+                "ptr_wrapper": {
+                    "id": 2147483717,
+                    "data": {
+                        "width": 5184,
+                        "height": 3888,
+                        "focal_length": 3714.9502813289073,
+                        "principal_point": [
+                            2595.0859946739679,
+                            1964.1859583803944
+                        ],
+                        "disto_k3": [
+                            -0.0068846598283942217,
+                            0.029393947544796364,
+                            -0.02755895203701085
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "extrinsics": [
+        {
+            "key": 0,
+            "value": {
+                "rotation": [
+                    [
+                        0.41434561451203683,
+                        -0.90921420233974137,
+                        0.040586278449130708
+                    ],
+                    [
+                        0.56809192924270024,
+                        0.29321532854082333,
+                        0.76895795141087142
+                    ],
+                    [
+                        -0.71104800939454826,
+                        -0.29555761768630634,
+                        0.63800973579064257
+                    ]
+                ],
+                "center": [
+                    3.7392575250069009,
+                    1.4781061481589732,
+                    -1.1556437534554016
+                ]
+            }
+        },
+        {
+            "key": 1,
+            "value": {
+                "rotation": [
+                    [
+                        0.54875875308063704,
+                        -0.83260571212566747,
+                        0.075043714281043963
+                    ],
+                    [
+                        0.5224628936276251,
+                        0.41164986920178509,
+                        0.74671072710146758
+                    ],
+                    [
+                        -0.65260735185840002,
+                        -0.37055649140429819,
+                        0.66090205853704431
+                    ]
+                ],
+                "center": [
+                    3.5572031767976044,
+                    1.8183189800181163,
+                    -1.3352211135636247
+                ]
+            }
+        },
+        {
+            "key": 2,
+            "value": {
+                "rotation": [
+                    [
+                        0.64937933482726695,
+                        -0.75903311775827942,
+                        0.046639099963895883
+                    ],
+                    [
+                        0.59102357416666484,
+                        0.54233233147338167,
+                        0.59713212693499151
+                    ],
+                    [
+                        -0.47853695184233902,
+                        -0.36020045583645777,
+                        0.80078587483587083
+                    ]
+                ],
+                "center": [
+                    3.1179796518128478,
+                    1.9414771320570763,
+                    -2.2662822464219072
+                ]
+            }
+        },
+        {
+            "key": 3,
+            "value": {
+                "rotation": [
+                    [
+                        0.78266476117010708,
+                        -0.62151308263731364,
+                        0.034019990199930648
+                    ],
+                    [
+                        0.4928171358539814,
+                        0.65213182910958567,
+                        0.57606887441595467
+                    ],
+                    [
+                        -0.38021986038503841,
+                        -0.4341031738801851,
+                        0.8166928995625784
+                    ]
+                ],
+                "center": [
+                    2.7767299358277255,
+                    2.2994607710648109,
+                    -2.4968834038772836
+                ]
+            }
+        },
+        {
+            "key": 4,
+            "value": {
+                "rotation": [
+                    [
+                        0.87070614698395332,
+                        -0.49081504138263354,
+                        0.031167302689227173
+                    ],
+                    [
+                        0.39340222698786781,
+                        0.73312394483903254,
+                        0.55476478736906265
+                    ],
+                    [
+                        -0.29513639796769281,
+                        -0.4707758242053417,
+                        0.83142325559154107
+                    ]
+                ],
+                "center": [
+                    2.3987355170441478,
+                    2.4175248361830541,
+                    -2.4926540347753421
+                ]
+            }
+        },
+        {
+            "key": 5,
+            "value": {
+                "rotation": [
+                    [
+                        0.93714062400494436,
+                        -0.34838973290076691,
+                        0.019800122448006153
+                    ],
+                    [
+                        0.2830827506246405,
+                        0.79219625200657462,
+                        0.54063782202646871
+                    ],
+                    [
+                        -0.20403824920443545,
+                        -0.5010485927692726,
+                        0.8410224138187522
+                    ]
+                ],
+                "center": [
+                    1.8648871793991051,
+                    2.5693288515229731,
+                    -2.5089129231234288
+                ]
+            }
+        },
+        {
+            "key": 6,
+            "value": {
+                "rotation": [
+                    [
+                        0.9788091673484477,
+                        -0.20477448384335192,
+                        -0.00015710292023814174
+                    ],
+                    [
+                        0.1743072102053507,
+                        0.8327743839908589,
+                        0.52545582291860959
+                    ],
+                    [
+                        -0.10746911363301753,
+                        -0.51434836068109946,
+                        0.85082087038318421
+                    ]
+                ],
+                "center": [
+                    1.2616985879035671,
+                    2.542365076198136,
+                    -2.5168676462219848
+                ]
+            }
+        },
+        {
+            "key": 7,
+            "value": {
+                "rotation": [
+                    [
+                        0.99656767180432859,
+                        -0.078256401362352151,
+                        -0.026996502742293874
+                    ],
+                    [
+                        0.080506416611322407,
+                        0.84024785389906609,
+                        0.5361923730364111
+                    ],
+                    [
+                        -0.019276732059776761,
+                        -0.53652537653295407,
+                        0.84366398994935621
+                    ]
+                ],
+                "center": [
+                    0.84276135332288515,
+                    2.5145726930405052,
+                    -2.5363024358054305
+                ]
+            }
+        },
+        {
+            "key": 8,
+            "value": {
+                "rotation": [
+                    [
+                        0.99986742522206262,
+                        0.003869887820788944,
+                        -0.015816319042604107
+                    ],
+                    [
+                        0.0053021362337664713,
+                        0.84102685278215394,
+                        0.54096739296440388
+                    ],
+                    [
+                        0.015395432152476672,
+                        -0.54097953461069082,
+                        0.8408948351614719
+                    ]
+                ],
+                "center": [
+                    0.4367102163401359,
+                    2.4625540055893493,
+                    -2.5644966700605525
+                ]
+            }
+        },
+        {
+            "key": 9,
+            "value": {
+                "rotation": [
+                    [
+                        0.98557586570353273,
+                        0.16882464608303954,
+                        -0.011766555046771338
+                    ],
+                    [
+                        -0.13823790867009958,
+                        0.84322128372165073,
+                        0.51948835144334915
+                    ],
+                    [
+                        0.09762424672820505,
+                        -0.51036859773476251,
+                        0.8543965126900992
+                    ]
+                ],
+                "center": [
+                    0.13056025589220738,
+                    2.1419295139175456,
+                    -2.5650959989349862
+                ]
+            }
+        },
+        {
+            "key": 10,
+            "value": {
+                "rotation": [
+                    [
+                        0.98463544355431076,
+                        0.17011050102491376,
+                        -0.039439329832778459
+                    ],
+                    [
+                        -0.12931263735430018,
+                        0.86208863737009045,
+                        0.48998104365154371
+                    ],
+                    [
+                        0.11735111894260376,
+                        -0.47735269849287915,
+                        0.87084046536922344
+                    ]
+                ],
+                "center": [
+                    -0.19507865597700244,
+                    1.8448896978598051,
+                    -2.5681740277124252
+                ]
+            }
+        },
+        {
+            "key": 11,
+            "value": {
+                "rotation": [
+                    [
+                        0.95684784720445204,
+                        0.2843941830539814,
+                        -0.059683715913677257
+                    ],
+                    [
+                        -0.22029083662309282,
+                        0.8438512304004403,
+                        0.48927195735251466
+                    ],
+                    [
+                        0.1895102757111177,
+                        -0.45501104337886306,
+                        0.87008666568519188
+                    ]
+                ],
+                "center": [
+                    -0.51266736510609556,
+                    1.6259979893434011,
+                    -2.5572802404645691
+                ]
+            }
+        },
+        {
+            "key": 12,
+            "value": {
+                "rotation": [
+                    [
+                        0.90046099101851929,
+                        0.42743019433003626,
+                        -0.080457644937778419
+                    ],
+                    [
+                        -0.33810475408325341,
+                        0.80427197844364084,
+                        0.48870416404677225
+                    ],
+                    [
+                        0.2735967450834329,
+                        -0.41285592361662826,
+                        0.86873172349950001
+                    ]
+                ],
+                "center": [
+                    -0.95459154267156399,
+                    1.4755610496767004,
+                    -2.5801272278210443
+                ]
+            }
+        },
+        {
+            "key": 13,
+            "value": {
+                "rotation": [
+                    [
+                        0.80295900571626178,
+                        0.58841559887273409,
+                        -0.09499430584195101
+                    ],
+                    [
+                        -0.45877205938161963,
+                        0.71188952266644712,
+                        0.53173443094131689
+                    ],
+                    [
+                        0.38050628466544434,
+                        -0.38338021665310273,
+                        0.84156673936718773
+                    ]
+                ],
+                "center": [
+                    -1.5345561271530939,
+                    1.3459830405531723,
+                    -2.637296394649538
+                ]
+            }
+        },
+        {
+            "key": 14,
+            "value": {
+                "rotation": [
+                    [
+                        0.68325571977669242,
+                        0.72401791939637494,
+                        -0.09465555337843877
+                    ],
+                    [
+                        -0.58038373309754265,
+                        0.61716609516259913,
+                        0.53128215981482962
+                    ],
+                    [
+                        0.44307600222557131,
+                        -0.30806503108060512,
+                        0.84189048746087591
+                    ]
+                ],
+                "center": [
+                    -1.7885918600305779,
+                    1.1390491008609909,
+                    -2.6305585810350567
+                ]
+            }
+        },
+        {
+            "key": 15,
+            "value": {
+                "rotation": [
+                    [
+                        0.5610379216318423,
+                        0.82027106117254567,
+                        -0.11131862689545134
+                    ],
+                    [
+                        -0.6692597339179136,
+                        0.52861428492720552,
+                        0.5221669716929852
+                    ],
+                    [
+                        0.48716307233527689,
+                        -0.21845439792726815,
+                        0.84554705190136437
+                    ]
+                ],
+                "center": [
+                    -2.1392968055646144,
+                    0.60937907646525891,
+                    -2.5895113156626413
+                ]
+            }
+        },
+        {
+            "key": 16,
+            "value": {
+                "rotation": [
+                    [
+                        0.48653832920163675,
+                        0.86507486082313045,
+                        -0.1221717618335821
+                    ],
+                    [
+                        -0.68830414533723538,
+                        0.4656722872807435,
+                        0.55622542585744739
+                    ],
+                    [
+                        0.53806863663408011,
+                        -0.18653365924294329,
+                        0.82200202934067013
+                    ]
+                ],
+                "center": [
+                    -2.4588883307369191,
+                    0.31330027690916612,
+                    -2.6342075269992464
+                ]
+            }
+        },
+        {
+            "key": 17,
+            "value": {
+                "rotation": [
+                    [
+                        0.31400094893199348,
+                        0.94171625485938615,
+                        -0.12072240638514169
+                    ],
+                    [
+                        -0.74733909595796066,
+                        0.32358316944184384,
+                        0.58032594988222697
+                    ],
+                    [
+                        0.58556611900155697,
+                        -0.09200232490313838,
+                        0.8053867968186913
+                    ]
+                ],
+                "center": [
+                    -2.6063200239510702,
+                    -0.022020694926586513,
+                    -2.6291132477001118
+                ]
+            }
+        },
+        {
+            "key": 18,
+            "value": {
+                "rotation": [
+                    [
+                        0.15665839610670285,
+                        0.98141308591896537,
+                        -0.11084449339633087
+                    ],
+                    [
+                        -0.77636568170937026,
+                        0.19174019025167796,
+                        0.60040988308504328
+                    ],
+                    [
+                        0.61050346042690073,
+                        -0.0080033886113436113,
+                        0.79197315016199621
+                    ]
+                ],
+                "center": [
+                    -2.8922417497724977,
+                    -0.30057949292022285,
+                    -2.6592751835502515
+                ]
+            }
+        },
+        {
+            "key": 19,
+            "value": {
+                "rotation": [
+                    [
+                        0.033500365039464082,
+                        0.99262331641878743,
+                        -0.11651899949789501
+                    ],
+                    [
+                        -0.79895144113359595,
+                        0.096641387965174491,
+                        0.59357984875054082
+                    ],
+                    [
+                        0.60046175586191408,
+                        0.073207880955074953,
+                        0.79629535093035331
+                    ]
+                ],
+                "center": [
+                    -2.8426298413042077,
+                    -0.65908864289599001,
+                    -2.6346610426962478
+                ]
+            }
+        },
+        {
+            "key": 20,
+            "value": {
+                "rotation": [
+                    [
+                        -0.16187659375118557,
+                        0.98250840597874811,
+                        -0.092049989552488012
+                    ],
+                    [
+                        -0.78759138804413442,
+                        -0.07243177542098557,
+                        0.61192601136745095
+                    ],
+                    [
+                        0.59455510583479754,
+                        0.17155427738900444,
+                        0.78554016831433238
+                    ]
+                ],
+                "center": [
+                    -2.8652554991331383,
+                    -1.0808962033903471,
+                    -2.607855743089607
+                ]
+            }
+        },
+        {
+            "key": 21,
+            "value": {
+                "rotation": [
+                    [
+                        -0.25997934937428141,
+                        0.95898106067181199,
+                        -0.11298700443719749
+                    ],
+                    [
+                        -0.7906164436070845,
+                        -0.14422302870175577,
+                        0.59508432771345787
+                    ],
+                    [
+                        0.55437927179595281,
+                        0.24403901996373137,
+                        0.79568120484156857
+                    ]
+                ],
+                "center": [
+                    -2.6404587342245431,
+                    -1.4029226017988423,
+                    -2.5763847837285239
+                ]
+            }
+        },
+        {
+            "key": 22,
+            "value": {
+                "rotation": [
+                    [
+                        -0.46454742572321106,
+                        0.8801363260676508,
+                        -0.097753448993248074
+                    ],
+                    [
+                        -0.71121821240292338,
+                        -0.30504799321935944,
+                        0.63333591101344633
+                    ],
+                    [
+                        0.52760244844042192,
+                        0.36373860032855937,
+                        0.76767824446879607
+                    ]
+                ],
+                "center": [
+                    -2.5701198730470942,
+                    -1.9710679105339672,
+                    -2.5823879549869391
+                ]
+            }
+        },
+        {
+            "key": 23,
+            "value": {
+                "rotation": [
+                    [
+                        -0.64126338849221587,
+                        0.76289268744124916,
+                        -0.082316547717635913
+                    ],
+                    [
+                        -0.6229516055260198,
+                        -0.4549716135565573,
+                        0.63634277557798746
+                    ],
+                    [
+                        0.44800955765701644,
+                        0.45934255007174252,
+                        0.76700186306263507
+                    ]
+                ],
+                "center": [
+                    -2.0561706229194288,
+                    -2.3724360034467007,
+                    -2.5187526252920613
+                ]
+            }
+        },
+        {
+            "key": 24,
+            "value": {
+                "rotation": [
+                    [
+                        -0.7612543558044027,
+                        0.64660917809457896,
+                        -0.048871019763015194
+                    ],
+                    [
+                        -0.50649679526992386,
+                        -0.54585264418352752,
+                        0.6674622740044176
+                    ],
+                    [
+                        0.40491085704154772,
+                        0.53286157831251513,
+                        0.74303817950908502
+                    ]
+                ],
+                "center": [
+                    -1.8472288739305989,
+                    -2.9818806011538244,
+                    -2.5677358487305253
+                ]
+            }
+        },
+        {
+            "key": 25,
+            "value": {
+                "rotation": [
+                    [
+                        -0.84199354124603265,
+                        0.53013311733139978,
+                        -0.10002876790432709
+                    ],
+                    [
+                        -0.44089553278298588,
+                        -0.56933486440998593,
+                        0.69387963029568023
+                    ],
+                    [
+                        0.31089870644950013,
+                        0.62834440402995162,
+                        0.71310960185112648
+                    ]
+                ],
+                "center": [
+                    -1.3506291793393899,
+                    -3.2991041290395753,
+                    -2.5559714032079452
+                ]
+            }
+        },
+        {
+            "key": 26,
+            "value": {
+                "rotation": [
+                    [
+                        -0.89709068208381815,
+                        0.4327358090306187,
+                        -0.089263809581520664
+                    ],
+                    [
+                        -0.37194781023696843,
+                        -0.63055286564266888,
+                        0.6812179607803529
+                    ],
+                    [
+                        0.23850185445466501,
+                        0.64431576359145082,
+                        0.72661823690934912
+                    ]
+                ],
+                "center": [
+                    -1.0591126378797266,
+                    -3.3477336079323163,
+                    -2.5300597728063861
+                ]
+            }
+        },
+        {
+            "key": 27,
+            "value": {
+                "rotation": [
+                    [
+                        -0.95504037951528475,
+                        0.2917175992417374,
+                        -0.052902890166212121
+                    ],
+                    [
+                        -0.25180775021322888,
+                        -0.70394330059610721,
+                        0.6641209878315929
+                    ],
+                    [
+                        0.15649514506160669,
+                        0.6475837180152817,
+                        0.74575102932121429
+                    ]
+                ],
+                "center": [
+                    -0.58240918626879223,
+                    -3.3616633184622344,
+                    -2.7885448112083036
+                ]
+            }
+        },
+        {
+            "key": 28,
+            "value": {
+                "rotation": [
+                    [
+                        -0.93579602763913505,
+                        0.34615885947470809,
+                        -0.066782023494234274
+                    ],
+                    [
+                        -0.30739530686376265,
+                        -0.70843678745480754,
+                        0.63531523159676018
+                    ],
+                    [
+                        0.1726091537924577,
+                        0.6150539506318784,
+                        0.76935994036547706
+                    ]
+                ],
+                "center": [
+                    -0.51914760808845073,
+                    -3.3026513692759427,
+                    -2.7778898722699252
+                ]
+            }
+        },
+        {
+            "key": 29,
+            "value": {
+                "rotation": [
+                    [
+                        -0.98515019182459762,
+                        0.16652446190966186,
+                        -0.041817497936347849
+                    ],
+                    [
+                        -0.15658174651969273,
+                        -0.77146256965111315,
+                        0.61670711061584504
+                    ],
+                    [
+                        0.070436185336810897,
+                        0.61409698518474987,
+                        0.7860811895613572
+                    ]
+                ],
+                "center": [
+                    0.25359061483513018,
+                    -2.9011047030551196,
+                    -2.6817480077414237
+                ]
+            }
+        },
+        {
+            "key": 30,
+            "value": {
+                "rotation": [
+                    [
+                        -0.99376498424904969,
+                        -0.10336483992306343,
+                        -0.041795525456270272
+                    ],
+                    [
+                        0.056009524404809115,
+                        -0.78694626732273143,
+                        0.61447416993944282
+                    ],
+                    [
+                        -0.096405856961251882,
+                        0.6083019663082635,
+                        0.78782906047509282
+                    ]
+                ],
+                "center": [
+                    0.88710528276647893,
+                    -2.7361792609911699,
+                    -2.6207826004378587
+                ]
+            }
+        },
+        {
+            "key": 31,
+            "value": {
+                "rotation": [
+                    [
+                        -0.97462588188628219,
+                        -0.22027059249658965,
+                        -0.039815278959062388
+                    ],
+                    [
+                        0.16524208179808578,
+                        -0.82799743942182036,
+                        0.53583140512099847
+                    ],
+                    [
+                        -0.15099485011225164,
+                        0.515655996175852,
+                        0.84338570585910932
+                    ]
+                ],
+                "center": [
+                    1.3028459060272175,
+                    -2.3342225779410222,
+                    -2.5274348555032051
+                ]
+            }
+        },
+        {
+            "key": 32,
+            "value": {
+                "rotation": [
+                    [
+                        -0.91462193605914743,
+                        -0.40047494550559515,
+                        -0.055556566683943709
+                    ],
+                    [
+                        0.33386034926999553,
+                        -0.82559167600218986,
+                        0.4549018044602724
+                    ],
+                    [
+                        -0.22804381435314897,
+                        0.39751503435491076,
+                        0.88880696227981926
+                    ]
+                ],
+                "center": [
+                    1.5517257968996314,
+                    -1.7170712950767624,
+                    -2.4444706106989718
+                ]
+            }
+        },
+        {
+            "key": 33,
+            "value": {
+                "rotation": [
+                    [
+                        -0.84649738656653606,
+                        -0.52792532140381176,
+                        -0.068826081950860291
+                    ],
+                    [
+                        0.44704206195619156,
+                        -0.77503315249774951,
+                        0.4466284892070328
+                    ],
+                    [
+                        -0.28912898398116538,
+                        0.34730169528823523,
+                        0.89206836233101316
+                    ]
+                ],
+                "center": [
+                    1.9502492223329899,
+                    -1.3774170240158119,
+                    -2.4320835899306874
+                ]
+            }
+        },
+        {
+            "key": 34,
+            "value": {
+                "rotation": [
+                    [
+                        -0.66374826285147026,
+                        -0.74608084196090552,
+                        -0.052930339320302514
+                    ],
+                    [
+                        0.63850667901909786,
+                        -0.60205698196173985,
+                        0.47941277759267553
+                    ],
+                    [
+                        -0.38954776909855171,
+                        0.28441302313717626,
+                        0.87599187659493427
+                    ]
+                ],
+                "center": [
+                    2.3428308594950416,
+                    -1.0598368225389119,
+                    -2.4857548714631967
+                ]
+            }
+        },
+        {
+            "key": 35,
+            "value": {
+                "rotation": [
+                    [
+                        -0.35769463491504405,
+                        -0.93374361553441687,
+                        -0.013319482036055158
+                    ],
+                    [
+                        0.82716458196152132,
+                        -0.32342224330146152,
+                        0.45956153764895546
+                    ],
+                    [
+                        -0.43342046848460603,
+                        0.15336529264004181,
+                        0.88804604864388614
+                    ]
+                ],
+                "center": [
+                    2.5883190304948291,
+                    -0.46976789032439636,
+                    -2.4920595153686831
+                ]
+            }
+        },
+        {
+            "key": 36,
+            "value": {
+                "rotation": [
+                    [
+                        -0.12919701143027781,
+                        -0.99161626426082883,
+                        0.002305795065240319
+                    ],
+                    [
+                        0.86528553369213734,
+                        -0.11160110073305225,
+                        0.48869841364412481
+                    ],
+                    [
+                        -0.48434396602063462,
+                        0.065133545647149835,
+                        0.87244973712577467
+                    ]
+                ],
+                "center": [
+                    2.7192661574122825,
+                    -0.1919051385853956,
+                    -2.5559688053336349
+                ]
+            }
+        },
+        {
+            "key": 37,
+            "value": {
+                "rotation": [
+                    [
+                        -0.039759763951882382,
+                        -0.99704468004054003,
+                        -0.065734824662032912
+                    ],
+                    [
+                        0.87848687920760715,
+                        -0.066226854607581431,
+                        0.47315410469408986
+                    ],
+                    [
+                        -0.47610919360013426,
+                        -0.038934685457107168,
+                        0.8785238335058343
+                    ]
+                ],
+                "center": [
+                    2.6797417288841583,
+                    0.3331516087647326,
+                    -2.772265837917407
+                ]
+            }
+        },
+        {
+            "key": 38,
+            "value": {
+                "rotation": [
+                    [
+                        0.12692683045210892,
+                        -0.98835860108421414,
+                        -0.083885966491642178
+                    ],
+                    [
+                        0.8829379965111338,
+                        0.074039676846916383,
+                        0.46361473290794941
+                    ],
+                    [
+                        -0.45200671900790002,
+                        -0.13291125578843774,
+                        0.88205698458572057
+                    ]
+                ],
+                "center": [
+                    2.646205489451237,
+                    0.86043991720737545,
+                    -2.8250294573310724
+                ]
+            }
+        },
+        {
+            "key": 39,
+            "value": {
+                "rotation": [
+                    [
+                        0.39258106746340898,
+                        -0.91193374273978778,
+                        -0.11940248875920954
+                    ],
+                    [
+                        0.82263359325576835,
+                        0.29011330833620108,
+                        0.48898695235489442
+                    ],
+                    [
+                        -0.41128345057441074,
+                        -0.2901915181028335,
+                        0.8640803238731799
+                    ]
+                ],
+                "center": [
+                    2.7888896919061659,
+                    1.6049554502397507,
+                    -3.0131395925088045
+                ]
+            }
+        },
+        {
+            "key": 40,
+            "value": {
+                "rotation": [
+                    [
+                        0.68828210318383154,
+                        -0.72530578874594598,
+                        -0.014115921807058883
+                    ],
+                    [
+                        0.6518282556293209,
+                        0.60978034326461572,
+                        0.45087454810770189
+                    ],
+                    [
+                        -0.31841430809572369,
+                        -0.31953003893172377,
+                        0.89247570421844691
+                    ]
+                ],
+                "center": [
+                    2.4743879834931342,
+                    1.9644276476536111,
+                    -3.0749083731214077
+                ]
+            }
+        },
+        {
+            "key": 41,
+            "value": {
+                "rotation": [
+                    [
+                        0.85263810264248519,
+                        -0.52249969123200113,
+                        -0.0015292431744488382
+                    ],
+                    [
+                        0.46401913903130154,
+                        0.75585501386742504,
+                        0.46191929665702913
+                    ],
+                    [
+                        -0.2401968037565711,
+                        -0.39455959077677777,
+                        0.88692064176632457
+                    ]
+                ],
+                "center": [
+                    2.0321396848024991,
+                    2.2474841193691075,
+                    -3.0547119802446776
+                ]
+            }
+        },
+        {
+            "key": 42,
+            "value": {
+                "rotation": [
+                    [
+                        0.88717240904221495,
+                        -0.46142455361091378,
+                        -0.0035352452816867675
+                    ],
+                    [
+                        0.41485188875871803,
+                        0.79422655948470933,
+                        0.44396180308941652
+                    ],
+                    [
+                        -0.20204709111382185,
+                        -0.39533726555189619,
+                        0.89603873768849562
+                    ]
+                ],
+                "center": [
+                    1.5889546392907943,
+                    1.8795352505331604,
+                    -3.0233950850631595
+                ]
+            }
+        },
+        {
+            "key": 43,
+            "value": {
+                "rotation": [
+                    [
+                        0.94035270012975636,
+                        -0.34017563033835979,
+                        0.0041641184633000256
+                    ],
+                    [
+                        0.31041437661822413,
+                        0.86296335473644026,
+                        0.39866924031175049
+                    ],
+                    [
+                        -0.13921104175817414,
+                        -0.3735970943488835,
+                        0.9170853269716378
+                    ]
+                ],
+                "center": [
+                    1.2029967888465656,
+                    1.3334432847678219,
+                    -2.2085185439654547
+                ]
+            }
+        },
+        {
+            "key": 44,
+            "value": {
+                "rotation": [
+                    [
+                        0.99207342461411607,
+                        -0.11263442107048077,
+                        -0.055711824279390011
+                    ],
+                    [
+                        0.12495116453300913,
+                        0.93123789515327715,
+                        0.3423203019283827
+                    ],
+                    [
+                        0.013323912948712834,
+                        -0.34656813157099692,
+                        0.93793016985441047
+                    ]
+                ],
+                "center": [
+                    0.96502141281228837,
+                    0.75190269847709912,
+                    -1.8895622738579803
+                ]
+            }
+        },
+        {
+            "key": 45,
+            "value": {
+                "rotation": [
+                    [
+                        0.99710951319401353,
+                        0.021724253092336939,
+                        -0.072805738273694826
+                    ],
+                    [
+                        -0.01734006173134163,
+                        0.99802859663602883,
+                        0.060317846081171182
+                    ],
+                    [
+                        0.073972568950597631,
+                        -0.058881042146846252,
+                        0.9955205080351438
+                    ]
+                ],
+                "center": [
+                    0.95247586165210019,
+                    0.12233364219666597,
+                    -1.6938331117411867
+                ]
+            }
+        },
+        {
+            "key": 46,
+            "value": {
+                "rotation": [
+                    [
+                        0.99701362198015941,
+                        0.012976222891340525,
+                        -0.07612788730470596
+                    ],
+                    [
+                        -0.0068481092601192098,
+                        0.9967542209503526,
+                        0.080213006533960268
+                    ],
+                    [
+                        0.076921654854567659,
+                        -0.079452128084337256,
+                        0.9938663986458669
+                    ]
+                ],
+                "center": [
+                    0.50886079149081687,
+                    0.11035640414099621,
+                    -1.5656891080032207
+                ]
+            }
+        },
+        {
+            "key": 47,
+            "value": {
+                "rotation": [
+                    [
+                        0.99828213350070771,
+                        -0.018873555983145641,
+                        -0.055466844311049132
+                    ],
+                    [
+                        0.023713291504061863,
+                        0.99584398320232403,
+                        0.087934298915571252
+                    ],
+                    [
+                        0.053576690260956614,
+                        -0.089098540977283786,
+                        0.99458081031980539
+                    ]
+                ],
+                "center": [
+                    0.22849812710312328,
+                    0.10335035411893599,
+                    -1.5701827317627515
+                ]
+            }
+        },
+        {
+            "key": 48,
+            "value": {
+                "rotation": [
+                    [
+                        0.99942427712098947,
+                        -0.0060730782517174845,
+                        -0.033380114166014843
+                    ],
+                    [
+                        0.010368858351806173,
+                        0.99145067421890454,
+                        0.13006939442989557
+                    ],
+                    [
+                        0.032304815084873158,
+                        -0.13034062417921777,
+                        0.99094284427049772
+                    ]
+                ],
+                "center": [
+                    -0.13765396207363198,
+                    0.13496836530581,
+                    -1.5998424113746068
+                ]
+            }
+        },
+        {
+            "key": 49,
+            "value": {
+                "rotation": [
+                    [
+                        0.99936073975249928,
+                        0.019182950747375034,
+                        -0.030168298625564877
+                    ],
+                    [
+                        -0.014499678817961905,
+                        0.98881602231437926,
+                        0.14843393590599402
+                    ],
+                    [
+                        0.03267829792864712,
+                        -0.14790161735083418,
+                        0.98846205816383959
+                    ]
+                ],
+                "center": [
+                    -0.58059576635057586,
+                    0.13324870832451302,
+                    -1.6536884918827455
+                ]
+            }
+        },
+        {
+            "key": 50,
+            "value": {
+                "rotation": [
+                    [
+                        0.98421517796934732,
+                        0.16515832785996948,
+                        -0.06358624216971033
+                    ],
+                    [
+                        -0.14796068575085788,
+                        0.96503413045962261,
+                        0.21637181544779921
+                    ],
+                    [
+                        0.09709850115682582,
+                        -0.20354816085275598,
+                        0.97423817790443767
+                    ]
+                ],
+                "center": [
+                    -0.93320237794646532,
+                    0.31351290799030818,
+                    -1.8093791448044936
+                ]
+            }
+        },
+        {
+            "key": 51,
+            "value": {
+                "rotation": [
+                    [
+                        0.97554864935206853,
+                        0.16292080837098116,
+                        -0.14751828004386849
+                    ],
+                    [
+                        -0.134629221264633,
+                        0.97350423379231499,
+                        0.18483635889650166
+                    ],
+                    [
+                        0.1737233591922332,
+                        -0.16045658910803226,
+                        0.97163464197340277
+                    ]
+                ],
+                "center": [
+                    -1.4194527778976778,
+                    0.24240946922336207,
+                    -1.6209137657682235
+                ]
+            }
+        },
+        {
+            "key": 52,
+            "value": {
+                "rotation": [
+                    [
+                        0.98358799380234563,
+                        0.10261259285649672,
+                        -0.14840927947788105
+                    ],
+                    [
+                        -0.098374520681665203,
+                        0.99451104504784882,
+                        0.035640355757039326
+                    ],
+                    [
+                        0.15125181694290349,
+                        -0.020455734284120331,
+                        0.98828358825104856
+                    ]
+                ],
+                "center": [
+                    -1.3843726577396216,
+                    0.0048271809013470069,
+                    -0.85856007539633905
+                ]
+            }
+        },
+        {
+            "key": 53,
+            "value": {
+                "rotation": [
+                    [
+                        0.9951618310700292,
+                        0.068741295823238138,
+                        -0.07019661124220046
+                    ],
+                    [
+                        -0.062690765481628385,
+                        0.99440382215451495,
+                        0.085034736477628423
+                    ],
+                    [
+                        0.075649176496998496,
+                        -0.080222644764644246,
+                        0.99390217293368055
+                    ]
+                ],
+                "center": [
+                    -1.4015408002202079,
+                    -0.014345141833507992,
+                    0.24575469757985885
+                ]
+            }
+        },
+        {
+            "key": 54,
+            "value": {
+                "rotation": [
+                    [
+                        0.99672035567512662,
+                        0.04206021240788025,
+                        -0.069133719088828482
+                    ],
+                    [
+                        -0.038240003126534208,
+                        0.99771595832072901,
+                        0.055682750228702609
+                    ],
+                    [
+                        0.071317843095060743,
+                        -0.052856456978815962,
+                        0.9960521874941668
+                    ]
+                ],
+                "center": [
+                    -1.0554354820459215,
+                    0.0014976386354011875,
+                    0.19020006065252254
+                ]
+            }
+        },
+        {
+            "key": 55,
+            "value": {
+                "rotation": [
+                    [
+                        0.99911912647972634,
+                        0.040673047663088054,
+                        -0.010328324945747145
+                    ],
+                    [
+                        -0.039129819552832804,
+                        0.99189896513624165,
+                        0.12085239006083169
+                    ],
+                    [
+                        0.015160089846419717,
+                        -0.12034178889915526,
+                        0.9926167566187869
+                    ]
+                ],
+                "center": [
+                    -0.64705667331389716,
+                    0.018807922078887325,
+                    0.050156852837725148
+                ]
+            }
+        },
+        {
+            "key": 56,
+            "value": {
+                "rotation": [
+                    [
+                        0.99996703127966635,
+                        -0.0010384160610749735,
+                        0.0080534493116344343
+                    ],
+                    [
+                        0.0010295716546599514,
+                        0.9999988624781132,
+                        0.0011022815827664058
+                    ],
+                    [
+                        -0.0080545847775589496,
+                        -0.001093953638819662,
+                        0.9999669629190242
+                    ]
+                ],
+                "center": [
+                    0.061220334285646341,
+                    0.0033430714849191166,
+                    -0.14601851794260298
+                ]
+            }
+        },
+        {
+            "key": 57,
+            "value": {
+                "rotation": [
+                    [
+                        0.99934913974754458,
+                        0.015570836986340989,
+                        -0.03253991274400999
+                    ],
+                    [
+                        -0.015033061242510888,
+                        0.99974741847172521,
+                        0.016706475654674806
+                    ],
+                    [
+                        0.03279182757215441,
+                        -0.016206427572605889,
+                        0.99933079996055973
+                    ]
+                ],
+                "center": [
+                    0.38173083294129073,
+                    0.011855725667829173,
+                    -0.2014829119507546
+                ]
+            }
+        },
+        {
+            "key": 58,
+            "value": {
+                "rotation": [
+                    [
+                        0.99645938511784182,
+                        0.052840366802179545,
+                        -0.065395637826875186
+                    ],
+                    [
+                        -0.054285122047764631,
+                        0.99831470609776618,
+                        -0.020515192253315186
+                    ],
+                    [
+                        0.064201396673530448,
+                        0.023992566039136083,
+                        0.99764850395318372
+                    ]
+                ],
+                "center": [
+                    0.96902218032816612,
+                    0.037036271346757042,
+                    -0.23342228205597518
+                ]
+            }
+        },
+        {
+            "key": 60,
+            "value": {
+                "rotation": [
+                    [
+                        0.0061908619115003498,
+                        -0.99781867399655844,
+                        0.065723413275197706
+                    ],
+                    [
+                        0.61462078279562971,
+                        0.055641390280902092,
+                        0.78685788363801512
+                    ],
+                    [
+                        -0.78879843216406087,
+                        0.035523647213624381,
+                        0.61362456266365506
+                    ]
+                ],
+                "center": [
+                    1.7356011421806858,
+                    0.023179574694707241,
+                    0.40350968904800694
+                ]
+            }
+        },
+        {
+            "key": 61,
+            "value": {
+                "rotation": [
+                    [
+                        0.086908174831342347,
+                        -0.99620273667784875,
+                        -0.0052035164119560414
+                    ],
+                    [
+                        0.62742094051300856,
+                        0.050677157730870621,
+                        0.77702946475027079
+                    ],
+                    [
+                        -0.77381517984157988,
+                        -0.070795007732785312,
+                        0.6294427172720789
+                    ]
+                ],
+                "center": [
+                    2.637997835391662,
+                    0.15845136477661925,
+                    -0.016140300679014025
+                ]
+            }
+        },
+        {
+            "key": 62,
+            "value": {
+                "rotation": [
+                    [
+                        0.02241332206851342,
+                        0.99934118284935447,
+                        -0.028545459448152507
+                    ],
+                    [
+                        -0.734342578644122,
+                        0.035831706943851266,
+                        0.67783262385915843
+                    ],
+                    [
+                        0.67840888863881688,
+                        0.0057696653926366578,
+                        0.734661888746859
+                    ]
+                ],
+                "center": [
+                    -2.8170427266287583,
+                    -0.11801546254404686,
+                    -1.1937759760533178
+                ]
+            }
+        },
+        {
+            "key": 63,
+            "value": {
+                "rotation": [
+                    [
+                        0.33587380760832208,
+                        -0.026766843954813057,
+                        -0.94152659092953206
+                    ],
+                    [
+                        -0.0016912153655786852,
+                        0.99957738605571556,
+                        -0.029020494079365723
+                    ],
+                    [
+                        0.94190547569980454,
+                        0.011339548082792273,
+                        0.33568659415592245
+                    ]
+                ],
+                "center": [
+                    -2.713938451590451,
+                    -0.094005077929721445,
+                    0.1635445063449584
+                ]
+            }
+        },
+        {
+            "key": 64,
+            "value": {
+                "rotation": [
+                    [
+                        0.9993678286919242,
+                        0.034708831515120137,
+                        -0.0076967519411920001
+                    ],
+                    [
+                        -0.015487978832848021,
+                        0.61991226222156903,
+                        0.7845182659817489
+                    ],
+                    [
+                        0.032001023222117314,
+                        -0.78390310891218673,
+                        0.62005794112368706
+                    ]
+                ],
+                "center": [
+                    1.4799683321976822,
+                    2.5670977885853388,
+                    0.030232494755648195
+                ]
+            }
+        },
+        {
+            "key": 65,
+            "value": {
+                "rotation": [
+                    [
+                        0.97744886458785285,
+                        0.20974706477965777,
+                        0.024492568918657132
+                    ],
+                    [
+                        -0.14684207038025454,
+                        0.59174548690483575,
+                        0.79263780195887668
+                    ],
+                    [
+                        0.15176008527395302,
+                        -0.77835945908306214,
+                        0.60920064754854419
+                    ]
+                ],
+                "center": [
+                    0.74967551360750728,
+                    2.4222883187248856,
+                    -0.10242018775778819
+                ]
+            }
+        },
+        {
+            "key": 66,
+            "value": {
+                "rotation": [
+                    [
+                        0.90656264945386555,
+                        0.40888151911729059,
+                        -0.10469033355341224
+                    ],
+                    [
+                        -0.22433964030469297,
+                        0.67689945172129218,
+                        0.70105553135780585
+                    ],
+                    [
+                        0.35751348002998284,
+                        -0.61206456814926891,
+                        0.70538009329233275
+                    ]
+                ],
+                "center": [
+                    -1.197524730624127,
+                    2.2102327012745953,
+                    -0.64538031485994096
+                ]
+            }
+        },
+        {
+            "key": 67,
+            "value": {
+                "rotation": [
+                    [
+                        0.50739539691079849,
+                        0.84163236585379442,
+                        -0.18494559184008205
+                    ],
+                    [
+                        -0.54291837722694025,
+                        0.47890149493121698,
+                        0.68984997921425739
+                    ],
+                    [
+                        0.6691707905034403,
+                        -0.24961634341523073,
+                        0.69993009239281223
+                    ]
+                ],
+                "center": [
+                    -2.5077384049942961,
+                    1.0299242375697464,
+                    -0.8460246788317809
+                ]
+            }
+        }
+    ],
+    "structure": [],
+    "control_points": []
+}
