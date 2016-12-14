@@ -3,7 +3,7 @@
 doxel-viewer<br />
 This program is part of the DOXEL project <[http://doxel.org](http://doxel.org)>.
 
-Copyright (c) 2015 ALSENET SA - [http://doxel.org](http://doxel.org)<br />
+Copyright (c) 2015-2016 ALSENET SA - [http://doxel.org](http://doxel.org)<br />
 Please read <[http://doxel.org/license](http://doxel.org/license)> for more
 information.
 
