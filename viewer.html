@@ -31,6 +31,8 @@
 
     <script>
       $(document).ready(function(){
+
+
         var button=$('a.play');
         var icon=$('div',button);
         button.on('click',function(){
@@ -47,6 +49,36 @@
         $(viewer).on('stop',function(){
           icon.addClass('fa-play').removeClass('fa-stop');
           button.attr('title','Play');
+        });
+
+        var saveDataURL = (function () {
+            var a = document.createElement("a");
+            a.style.display='none';
+            document.body.appendChild(a);
+            return function (url, fileName) {
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                window.URL.revokeObjectURL(url);
+            };
+        }());
+
+        var recbutton=$('a.rec');
+        var recicon=$('div',recbutton);
+        recbutton.on('click',function(){
+          if (recicon.hasClass('fa-video-camera')) {
+            if (viewer.window && viewer.window.viewer && viewer.window.viewer.rec) {
+              recicon.addClass('fa-stop').removeClass('fa-video-camera');
+              recbutton.attr('title','Stop');
+              viewer.window.viewer.rec();
+            }
+          } else {
+            viewer.window.viewer.recorder.stopRecording(function(url) {
+              saveDataURL(url,'video.webm');
+              recicon.addClass('fa-video-camera').removeClass('fa-stop');
+              recbutton.attr('title','Record');
+            });
+          }
         });
 
 
@@ -85,29 +117,69 @@ a.button div {
   margin: 0.2em;
 }
 
-a.play {
+a.play, a.rec  {
   top: 10px;
-  right: 8px;
   width: 3em;
+}
+a.play {
+  right: 8px;
+}
+
+a.rec {
+  right: 4em;
 }
 
 @media screen and (min-height: 480px) and (min-width: 480px) {
-  a.play {
+  a.play, a.rec {
     top: 155px;
   }
 }     
       
 
-div.fa-play  {
-  padding-left: 0.2em;
+div.fa-video-camera  {
+  padding-left: 0.0em;
 }
 
-div.fa-stop  {
-  padding-left: 0.1em;
+div.fa-play  {
+  padding-left: 0.0em;
+}
+
+.play div.fa-stop  {
+  left: -3px;
+  top: 1px;
+}
+
+.rec div.fa-stop  {
+  left: -3px;
+  top: 1px;
+  color: rgba(255,0,0,1);
+}
+.rec div.fa-video-camera  {
+  left: -3px;
+  top: 0px;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+
+iframe.hidden + div#ajax-loader {
+  content: '';
+  background-image: url(/images/ajax-loader.gif);
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 9999999;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 iframe {
   background-color: black;
+  transition: opacity 1000ms;
 }
 
 </style>
@@ -119,12 +191,14 @@ iframe {
 
     <div id="thumbnails"><div class="content"></div></div>
 
-    <iframe class="target"></iframe>
+    <iframe class="target hidden"></iframe>
+    <div id="ajax-loader"></div>
     <div id="mapwrap">
-    <div id="map"></div>
+      <div id="map"></div>
     </div>
     <div id="controls">
-     <a class="button play" draggable="false"><div class="fa fa-play" aria-hidden="true"></div></a>
+     <a class="button rec" draggable="false"><div class="fa fa-fw fa-video-camera" aria-hidden="true"></div></a>
+     <a class="button play" draggable="false"><div class="fa fa-fw fa-play" aria-hidden="true"></div></a>
    </div>
 
   </body>
