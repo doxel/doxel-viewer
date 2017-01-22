@@ -1,12 +1,13 @@
 /*
  * doxel-viewer.js
  *
- * Copyright (c) 2015 ALSENET SA - http://doxel.org
+ * Copyright (c) 2015-2016 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
  *
  * Author(s):
  *
- *      Rurik Bogdanov <rurik.bugdanov@alsenet.com>
+ *      Luc Deschenaux <rurik.bugdanov@alsenet.com>
+ *      Rurik Bogdanov <luc.deschenaux@freesurf.ch>
  *
  * This file is part of the DOXEL project <http://doxel.org>.
  *

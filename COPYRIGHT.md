@@ -3,7 +3,7 @@
 doxel-viewer<br />
 This program is part of the DOXEL project <[http://doxel.org](http://doxel.org)>.
 
-Copyright (c) 2015 ALSENET SA - [http://doxel.org](http://doxel.org)<br />
+Copyright (c) 2015-2016 ALSENET SA - [http://doxel.org](http://doxel.org)<br />
 Please read <[http://doxel.org/license](http://doxel.org/license)> for more
 information.
 
@@ -64,4 +64,9 @@ This program includes works distributed under the terms of another license(s) an
     Copyright (c) 2010-2014, Vladimir Agafonkin<br />
     Copyright (c) 2010-2011, CloudMade<br />
     Leaflet is licensed under the [BSD 2-Clause license](http://opensource.org/licenses/BSD-2-Clause).
+
+*   __Potree 1.4RC__<br />
+    <(http://potree.org)><br />
+    Copyright (c) 2011-2015, Markus Schütz<br />
+    Potree is licensed under the [FreeBSD license](https://opensource.org/licenses/BSD-2-Clause).
 

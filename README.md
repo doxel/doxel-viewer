@@ -11,3 +11,12 @@ Actually a wrapper for Potree to display openMVG pointclouds featuring:
  - undistorted image overlay
  - show location on map from exif GPS info
 
+## Standalone installation (for testing and demonstration purposes)
+```
+git clone --recursive https://github.com/doxel/doxel-viewer.git
+cd doxel-viewer
+npm install
+bower install
+gulp
+```
+
