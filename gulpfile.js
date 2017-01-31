@@ -5,6 +5,7 @@ var gulp=require('gulp'),
   notify=require('gulp-notify'),
   bower=require('gulp-bower'),
   connect=require('gulp-connect')
+  cors=require('cors')
   opn=require('opn');
 
 var config={
@@ -29,6 +30,9 @@ gulp.task('wiredep', function(){
 gulp.task('connect', function(){
   connect.server({
     root: '.',
+    middleware: function(){
+      return [cors()];
+    },
     livereload: true
   });
 });

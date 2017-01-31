@@ -44,7 +44,7 @@ loadImage.getExifThumbnail=function(dataview, offset, length) {
 }
 
 function getParam(name) {
-  var list=window.location.search.substring(1).replace(/=/,'&').split('&');
+  var list=window.location.search.substring(1).replace(/=/g,'&').split('&');
   var index=list.indexOf(name);
   return (index<0)?undefined:decodeURIComponent(list[index+1]);
 }
@@ -1878,6 +1878,7 @@ var iframe={
     $(frustums).on('load',function(){
       $(viewer.container).removeClass('disabled');
       viewer.showFirstPose();
+      $(iframe).removeClass('hidden');
     });
     frustums.init(viewer.window);
 
