@@ -839,7 +839,7 @@ function initNavigation(){
 	});
 	
 	viewer.addEventListener("move_speed_changed", function(event){
-		$('#lblMoveSpeed')[0].innerHTML = viewer.getMoveSpeed().toFixed(1);
+		$('#lblMoveSpeed')[0].innerHTML = viewer.getMoveSpeed().toFixed(2);
 		$( "#sldMoveSpeed" ).slider({value: toExpSpeed(viewer.getMoveSpeed())});
 	});
 	
