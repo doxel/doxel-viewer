@@ -820,7 +820,7 @@ function initNavigation(){
 		function(){viewer.setLeftView()}
 	));
 	
-	var speedRange = new THREE.Vector2(1, 10*1000);
+	var speedRange = new THREE.Vector2(0.01, 10*1000);
 	
 	var toLinearSpeed = function(value){
 		return Math.pow(value, 4) * speedRange.y + speedRange.x;
