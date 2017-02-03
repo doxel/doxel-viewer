@@ -1268,13 +1268,14 @@ var viewer={
 
         requestAnimationFrame(showNextPose);
 
-        i+=0.1;
+        var incr=Math.min(1,0.001*viewer.window.viewer.moveSpeed);
+        i+=incr;
 
         if (i+1>viewer.data.extrinsics.length) {
           i=viewer.data.extrinsics.length-1;
         }
 
-        var poseIndex=i.toFixed(1);
+        var poseIndex=i.toFixed(5);
         var pose=viewer.getPoseExtrinsics(poseIndex);
 
         var rel=viewer.relativeCameraCoordinates();
@@ -1323,7 +1324,7 @@ var viewer={
         // get/update relative coordinates before scrolling
         var rel=viewer.relativeCameraCoordinates();
 
-	      if (frustums.imesh) {
+        if (frustums.imesh) {
           frustums.imesh.fadeOut();
         }
 
@@ -1670,6 +1671,9 @@ var frustums={
     * @method frustums.showImage
     */
     showImage: function frustums_showImage(pose) {
+      if (viewer.data.views[0].fov) { //  view added
+        return;
+      }
 
       // same pose, same mesh
       if (frustums.imesh && frustums.imesh.pose==pose) {
@@ -1875,6 +1879,61 @@ var iframe={
     }
 
     viewer.window=window;
+    window.jQuery('#clear-waypoints').on('click',function(e){
+      $('#thumbnails .content').empty();
+        var content=$('#thumbnails .content');  
+        content.width(content[0].childNodes.length*(192+8));                                        
+        viewer.data.extrinsics=[];
+        viewer.data.views=[];
+        viewer.thumbs=[];
+
+    });
+    window.jQuery('#add-waypoint').on('click',function(e){
+      var center=viewer.getCameraPosition();
+      var R=viewer.getCameraRotation();
+      var rotation=[
+        R[0],
+        [ -R[1][0], -R[1][1], -R[1][2] ],
+        R[2]
+      ]
+      var view={
+        key: viewer.data.views.length,
+        extrinsics: viewer.data.views.length,
+        fov: viewer.window.camera.fov
+      };
+      viewer.data.views.push(view);
+
+      viewer.data.extrinsics.push({
+        key: viewer.data.views.length-1,
+        value: {
+          center: center,
+          rotation: rotation
+
+        }
+      });
+
+      var dataUrl=viewer.window.$('#potree_render_area canvas')[0].toDataURL();
+      viewer.thumbs.push({
+        view: view,
+        url: dataUrl
+      });
+
+      var html=$('<a class="landscape" data-key="'+view.key+'" data-pose="'+view.extrinsics+'"><i></i></a>');
+      var content=$('#thumbnails .content');
+      $(html).appendTo(content);
+      $('#thumbnails .content').width(content[0].childNodes.length*(192+8));
+      $('i',html).css({
+        width: '192px',
+        height: '120px',
+        backgroundImage: 'url('+dataUrl+')',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover'
+      });
+      $('#thumbnails').mCustomScrollbar('update')
+
+    });
+
     $(frustums).on('load',function(){
       $(viewer.container).removeClass('disabled');
       viewer.showFirstPose();

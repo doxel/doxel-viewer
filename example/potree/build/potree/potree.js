@@ -12817,7 +12817,9 @@ Potree.Viewer = function(domElement, args){
 		scope.referenceFrame = new THREE.Object3D();
 		scope.scenePointCloud.add(scope.referenceFrame);
 
-		scope.renderer = new THREE.WebGLRenderer();
+		scope.renderer = new THREE.WebGLRenderer({
+        preserveDrawingBuffer: true
+    });
 		scope.renderer.setSize(width, height);
 		scope.renderer.autoClear = false;
 		scope.renderArea.appendChild(scope.renderer.domElement);
@@ -13176,6 +13178,7 @@ Potree.Viewer = function(domElement, args){
 	var PotreeRenderer = function(){
 
 		this.render = function(){
+
 			{// resize
 				var width = scaleFactor * scope.renderArea.clientWidth;
 				var height = scaleFactor * scope.renderArea.clientHeight;
@@ -13187,6 +13190,7 @@ Potree.Viewer = function(domElement, args){
 				scope.renderer.setSize(width, height);
 			}
 			
+      scope.renderer.clear();
 
 			//var queryAll = Potree.startQuery("All", viewer.renderer.getContext());
 			
@@ -13219,7 +13223,7 @@ Potree.Viewer = function(domElement, args){
 			}
 			
 			// render scene
-			scope.renderer.render(scope.fruscene, scope.camera);
+//			scope.renderer.render(scope.fruscene, scope.camera);
 			scope.renderer.render(scope.scene, scope.camera);
 			
 			//var queryPC = Potree.startQuery("PointCloud", viewer.renderer.getContext());
