@@ -1636,6 +1636,8 @@ var frustums={
     * @method frustums.show
     */
     show: function frustums_show(pose) {
+      if (viewer.data.views[0].fov) {return}
+
       frustums.mesh.visible=true;
 
       if (pose!=undefined) {
@@ -1672,6 +1674,7 @@ var frustums={
     */
     showImage: function frustums_showImage(pose) {
       if (viewer.data.views[0].fov) { //  view added
+        frustums.hide();
         return;
       }
 
