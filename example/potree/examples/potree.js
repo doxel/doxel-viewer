@@ -11,8 +11,8 @@ var sceneProperties = {
 	navigation: "Orbit",		// other options: "Orbit", "Flight"
 	useEDL: false,				
 };
-sceneProperties.cameraPosition= [ 3.739257525006901, 1.4781061481589732, -1.1556437534554016 ] ;
-sceneProperties.cameraTarget= [ 3.0282095156123527, 1.1825485304726668, -0.517634017664759 ] ;
-sceneProperties.cameraUp= [ -0.5680919292427002,
-  -0.29321532854082333,
-  -0.7689579514108714 ] ;
+sceneProperties.cameraPosition= [ -3.5230290787385905, -0.491060480278788, 0.2441247461346665 ] ;
+sceneProperties.cameraTarget= [ -3.4930819256421897, -0.4857987445988167, 1.2436623803231224 ] ;
+sceneProperties.cameraUp= [ -0.0027813201489790434,
+  -0.9999818345930651,
+  0.005347405176046927 ] ;
