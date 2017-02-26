@@ -12660,9 +12660,8 @@ Potree.Scene = class extends THREE.EventDispatcher{
 				light.target.position.set( 0, 0,0 );
 				this.scene.add(light);
 			}
-      */
 
-      scope.camera.near=0.001;
+      this.camera.near=0.001;
 			
 		}
 	}
