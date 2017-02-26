@@ -633,9 +633,9 @@ var viewer={
             if (!viewer.rel_active) {
               frustums.showImage(pose);
             }
-            if (viewer.window.controls.target) {
+            if (viewer.window.viewer.controls.target) {
               var p=viewer.getPoseExtrinsics(pose);
-              viewer.window.controls.center=new viewer.window.THREE.Vector3(
+              viewer.window.viewer.controls.center=new viewer.window.THREE.Vector3(
                 p.position[0],
                 p.position[1],
                 p.position[2]
@@ -672,7 +672,7 @@ var viewer={
       }
 
       var _window=viewer.window;
-      var camera=_window.camera;
+      var camera=_window.viewer.scene.camera;
 
       var poseIndex=options.pose;
       var scrolling=options.scrolling;
@@ -857,9 +857,9 @@ var viewer={
               pose0.right[2]+(pose1.right[2]-pose0.right[2])*frac
             ],
             [
-              -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
-              -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
-              -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+              (pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+              (pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+              (pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
             ],
             [
               pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
@@ -878,7 +878,7 @@ var viewer={
         position: pose0.extrinsics.center,
         rotation: [
           pose0.extrinsics.rotation[0],
-          [ -pose0.up[0], -pose0.up[1], -pose0.up[2] ],
+          [ pose0.up[0], pose0.up[1], pose0.up[2] ],
           pose0.extrinsics.rotation[2]
         ]
       }
@@ -891,7 +891,7 @@ var viewer={
     * @return {Array} position
     */
     getCameraPosition: function viewer_getCameraPosition(){
-      var pos=viewer.window.camera.position;
+      var pos=viewer.window.viewer.scene.camera.position;
       return [
         pos.x,
         pos.y,
@@ -906,7 +906,7 @@ var viewer={
     * @return {Array} rotation matrix
     */
     getCameraRotation: function viewer_getCameraRotation(){
-      var R=new viewer.window.THREE.Matrix4().makeRotationFromQuaternion(viewer.window.camera.quaternion);
+      var R=new viewer.window.THREE.Matrix4().makeRotationFromQuaternion(viewer.window.viewer.scene.camera.quaternion);
       var re=R.elements;
       return [
           [ re[0], re[1], re[2] ],
@@ -927,7 +927,7 @@ var viewer={
 
       // camera extrinsics
       var Rc=viewer.getCameraRotation();
-      var pc=viewer.window.camera.position;
+      var pc=viewer.window.viewer.scene.camera.position;
 
       // pose extrinsics
       var extrinsics=viewer.getPoseExtrinsics(viewer.pose);
@@ -1001,7 +1001,7 @@ var viewer={
     */
     goto: function viewer_goto(options) {
       var _window=viewer.window;
-      var camera=_window.camera;
+      var camera=_window.viewer.scene.camera;
       var THREE=_window.THREE;
 
       if (viewer.mode.goto) {
@@ -1072,7 +1072,7 @@ var viewer={
     moveCamera: function viewer_moveCamera(options){
 
       var _window=viewer.window;
-      var camera=_window.camera;
+      var camera=_window.viewer.scene.camera;
       var THREE=_window.THREE;
 
       if (options.position.length==2) {
@@ -1145,11 +1145,13 @@ var viewer={
       lookAt.x+=camera.position.x;
       lookAt.y+=camera.position.y;
       lookAt.z+=camera.position.z;
+ 
+      _window.viewer.scene.view.position.copy(camera.position);
 
-      if (_window.controls.target) {
+      if (_window.viewer.scene.view.lookAt) {
         // copy the lookAt vector to orbit controls targets
-        _window.controls.target.copy(lookAt);
-        _window.controls.target0.copy(lookAt);
+        _window.viewer.scene.view.lookAt(lookAt);
+        _window.viewer.scene.view.lookAt(lookAt);
 
       } else {
         // set the camera lookAt vector
@@ -1224,11 +1226,11 @@ var viewer={
           callback: function() {
             viewer.mode.showFirstPose=false;
             viewer.mode.firstPoseShown=true;
-            if (viewer.window.controls.target0) {
-              viewer.window.controls.target0.copy(viewer.window.controls.target);
+            if (viewer.window.viewer.controls.target0) {
+              viewer.window.viewer.controls.target0.copy(viewer.window.viewer.controls.target);
             }
-            if (viewer.window.controls.position) {
-              viewer.window.controls.position.copy(viewer.window.camera.position);
+            if (viewer.window.viewer.controls.position) {
+              viewer.window.viewer.controls.position.copy(viewer.window.viewer.scene.camera.position);
             }
             $(viewer).trigger('firstpose');
           }
@@ -1251,7 +1253,7 @@ var viewer={
       var incr;
       var _window=viewer.window;
 
-      if (!_window || !_window.camera || !viewer.mode.firstPoseShown) {
+      if (!_window || !_window.viewer.scene.camera || !viewer.mode.firstPoseShown) {
         clearTimeout(viewer.playTimeout);
         viewer.playTimeout=setTimeout(function(){
           viewer.play();
@@ -1487,7 +1489,7 @@ var frustums={
 
       // hide frustum image on orbitcontrols move start
       // TODO: the same with other controls (fly and earth)
-      viewer.window.controls.addEventListener('start',function(){
+      viewer.window.viewer.controls.addEventListener('start',function(){
         if (frustums.imesh) frustums.imesh.fadeOut();
       });
 
@@ -1560,7 +1562,7 @@ var frustums={
         frustums.show(frustums.initialPose);
       }
 
-      window.scene.add(frustums.mesh);
+      window.viewer.scene.scene.add(frustums.mesh);
 
     }, // frustums.addToScene
 
@@ -1744,7 +1746,7 @@ var frustums={
       frustums.imesh=new THREE.Mesh(geometry, material);
       frustums.imesh.pose=pose;
 
-      viewer.window.fruscene.add(frustums.imesh);
+      viewer.window.viewer.scene.fruscene.add(frustums.imesh);
 
       frustums.imesh.fadeIn=function fadeIn(callback) {
         function _fadeIn() {
@@ -1865,7 +1867,7 @@ var iframe={
     var iframe=this;
     var window=iframe.contentWindow;
 
-    if (!window.camera || !window.scene || !window.controls) {
+    if (!window.viewer || !window.viewer.scene || !window.viewer.scene.camera || !window.viewer.controls) {
       console.log(window);
       clearTimeout(iframe.onload_timeout);
       iframe.onload_timeout=setTimeout(function(){
