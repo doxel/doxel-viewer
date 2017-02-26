@@ -7,3 +7,7 @@
 [submodule "js/thirdparty/malihu-custom-scrollbar"]
 	path = js/thirdparty/malihu-custom-scrollbar
 	url = https://github.com/bugdanov/malihu-custom-scrollbar-plugin.git
+[submodule "potree"]
+	path = potree
+	url = https://github.com/doxel/potree
+	branch = doxel-latest
