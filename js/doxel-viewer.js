@@ -733,7 +733,10 @@ var viewer={
     */
     relativeCameraCoordinates: function viewer_relativeCameraCoordinates(pose) {
 
+      // disable for now
       var result=viewer.zorel;
+      viewer.rel_active=false;
+      return result;
 
       if (viewer._lockRelativeCameraExtrinsics) {
         // dont update relative camera Rt when entering play mode from
@@ -857,9 +860,9 @@ var viewer={
               pose0.right[2]+(pose1.right[2]-pose0.right[2])*frac
             ],
             [
-              (pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
-              (pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
-              (pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+              -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+              -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+              -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
             ],
             [
               pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
@@ -878,7 +881,7 @@ var viewer={
         position: pose0.extrinsics.center,
         rotation: [
           pose0.extrinsics.rotation[0],
-          [ pose0.up[0], pose0.up[1], pose0.up[2] ],
+          [ -pose0.up[0], -pose0.up[1], -pose0.up[2] ],
           pose0.extrinsics.rotation[2]
         ]
       }
@@ -1145,7 +1148,8 @@ var viewer={
       lookAt.x+=camera.position.x;
       lookAt.y+=camera.position.y;
       lookAt.z+=camera.position.z;
- 
+
+      _window.viewer.scene.view.up.copy(camera.up); 
       _window.viewer.scene.view.position.copy(camera.position);
 
       if (_window.viewer.scene.view.lookAt) {
