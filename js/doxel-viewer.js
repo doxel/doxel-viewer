@@ -857,9 +857,9 @@ var viewer={
               pose0.right[2]+(pose1.right[2]-pose0.right[2])*frac
             ],
             [
-              (pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
-              (pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
-              (pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
+              -(pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+              -(pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+              -(pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
             ],
             [
               pose0.out[0]+(pose1.out[0]-pose0.out[0])*frac,
@@ -878,7 +878,7 @@ var viewer={
         position: pose0.extrinsics.center,
         rotation: [
           pose0.extrinsics.rotation[0],
-          [ pose0.up[0], pose0.up[1], pose0.up[2] ],
+          [ -pose0.up[0], -pose0.up[1], -pose0.up[2] ],
           pose0.extrinsics.rotation[2]
         ]
       }
@@ -1072,8 +1072,11 @@ var viewer={
     moveCamera: function viewer_moveCamera(options){
 
       var _window=viewer.window;
-      var camera=_window.viewer.scene.camera;
       var THREE=_window.THREE;
+      var camera={
+        position: new THREE.Vector3(),
+        up: new THREE.Vector3()
+      }
 
       if (options.position.length==2) {
 
@@ -1093,9 +1096,9 @@ var viewer={
 
         // adjust scene camera up vector
         camera.up.set(
-          pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac,
-          pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac,
-          pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac
+          (pose0.up[0]+(pose1.up[0]-pose0.up[0])*frac),
+          (pose0.up[1]+(pose1.up[1]-pose0.up[1])*frac),
+          (pose0.up[2]+(pose1.up[2]-pose0.up[2])*frac)
         );
 
         // adjust camera lookAt vector
@@ -1145,18 +1148,11 @@ var viewer={
       lookAt.x+=camera.position.x;
       lookAt.y+=camera.position.y;
       lookAt.z+=camera.position.z;
- 
+
+      _window.viewer.scene.view.mode.doxel=true;
+      _window.viewer.scene.view.up.copy(camera.up);
+      _window.viewer.scene.view.lookAt.copy(lookAt);
       _window.viewer.scene.view.position.copy(camera.position);
-
-      if (_window.viewer.scene.view.lookAt) {
-        // copy the lookAt vector to orbit controls targets
-        _window.viewer.scene.view.lookAt(lookAt);
-        _window.viewer.scene.view.lookAt(lookAt);
-
-      } else {
-        // set the camera lookAt vector
-        camera.lookAt(lookAt);
-      }
 
       if (options.callback) {
         options.callback();
@@ -1226,12 +1222,14 @@ var viewer={
           callback: function() {
             viewer.mode.showFirstPose=false;
             viewer.mode.firstPoseShown=true;
+            /*
             if (viewer.window.viewer.controls.target0) {
               viewer.window.viewer.controls.target0.copy(viewer.window.viewer.controls.target);
             }
             if (viewer.window.viewer.controls.position) {
-              viewer.window.viewer.controls.position.copy(viewer.window.viewer.scene.camera.position);
+              viewer.window.viewer.scene.position.copy(viewer.window.viewer.scene.camera.position);
             }
+            */
             $(viewer).trigger('firstpose');
           }
         });

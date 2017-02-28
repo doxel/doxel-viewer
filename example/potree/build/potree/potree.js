@@ -1,6 +1,5 @@
 
 
-
 function Potree(){
 
 }
@@ -12373,7 +12372,10 @@ var getQueryParam = function(name) {
 
 Potree.View = class{
 	constructor(){
+    this.up = new THREE.Vector3(0,1,0);
 		this.position = new THREE.Vector3(0, 0, 0);
+    this.lookAt = new THREE.Vector3(0,0,0);
+    this.mode = {};
 		
 		this.yaw = Math.PI / 4;
 		this._pitch = -Math.PI / 4;
@@ -12387,6 +12389,10 @@ Potree.View = class{
 	
 	clone(){
 		let c = new Potree.View();
+    c.up = this.up;
+    c.position = this.position;
+    c.lookAt = this.lookAt;
+    c.mode = this.mode;
 		c.yaw = this.yaw;
 		c._pitch = this.pitch;
 		c.radius = this.radius;
@@ -12402,7 +12408,10 @@ Potree.View = class{
 	}
 	
 	set pitch(angle){
+    if (this.rotationLimits)
 		this._pitch = Math.max(Math.min(angle, this.maxPitch), this.minPitch);
+    else
+    this._pitch = angle;
 	}
 	
 	get direction(){
@@ -12618,8 +12627,10 @@ Potree.Scene = class extends THREE.EventDispatcher{
 		var light = new THREE.AmbientLight( 0x555555 ); // soft white light
 		this.scenePointCloud.add( light );
 		
-		let grid = Potree.utils.createGrid(5, 5, 2);
-		this.scene.add(grid);
+		if (this.showGrid) {
+      let grid = Potree.utils.createGrid(5, 5, 2);
+		  this.scene.add(grid);
+    }
 		
 		if (this.sceneBG) {// background
 		// var texture = THREE.ImageUtils.loadTexture( Potree.resourcePath + '/textures/background.gif' );
@@ -13870,7 +13881,10 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 		let width = this.renderArea.clientWidth;
 		let height = this.renderArea.clientHeight;
 
-		this.renderer = new THREE.WebGLRenderer({premultipliedAlpha: false});
+		this.renderer = new THREE.WebGLRenderer({
+      premultipliedAlpha: false,
+      preserveDrawingBuffer: true
+    });
 		this.renderer.setSize(width, height);
 		this.renderer.autoClear = false;
 		this.renderArea.appendChild(this.renderer.domElement);
@@ -14184,9 +14198,28 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 			//camera.rotation.y = scene.view.yaw;
 			
 			//camera.lookAt(scene.view.getPivot());
-			camera.rotation.order = "ZXY";
-			camera.rotation.x = Math.PI / 2 + this.scene.view.pitch;
-			camera.rotation.z = this.scene.view.yaw;
+      if (this.scene.view.mode.doxel) {
+        camera.up.copy(this.scene.view.up);
+        camera.lookAt(this.scene.view.lookAt);
+        camera.updateMatrixWorld();
+      } else {
+			  camera.rotation.order = "ZXY";
+			  camera.rotation.x = Math.PI / 2 + this.scene.view.pitch;
+			  camera.rotation.z = this.scene.view.yaw;
+      }
+      /*
+      var Y=new THREE.Vector3().copy(this.scene.view.up).normalize();
+      var Z=new THREE.Vector3().copy(this.scene.view.lookAt).normalize();
+      var X=new THREE.Vector3().crossVectors(Y,Z).normalize();
+      var R=new THREE.Matrix4().set(
+        X.x, X.y, X.z, 0,
+        Y.x, Y.y, Y.z, 0,
+        Z.x, Z.y, Z.z, 0,
+        0, 0, 0, 1
+      );
+      camera.rotation.setFromMatrix4(R);
+      */
+
 		}
 
 		{ // update clip boxes
@@ -14545,9 +14578,13 @@ class PotreeRenderer{
 		//var queryPC = Potree.startQuery("PointCloud", viewer.renderer.getContext());
 		viewer.renderer.render(viewer.scene.scenePointCloud, viewer.scene.camera);
 		//Potree.endQuery(queryPC, viewer.renderer.getContext());
-		
+
 		// render scene
+		viewer.renderer.render(viewer.scene.fruscene, viewer.scene.camera);
+    viewer.renderer.clearDepth();
+
 		viewer.renderer.render(viewer.scene.scene, viewer.scene.camera);
+
 		
 		viewer.volumeTool.update();
 		viewer.renderer.render(viewer.volumeTool.sceneVolume, viewer.scene.camera);
