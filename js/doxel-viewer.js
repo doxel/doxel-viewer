@@ -305,6 +305,7 @@ var viewer={
           xhrFields: {
             responseType: 'blob',
             onprogress: function(e){
+              return;
               viewer.jpeg_table=e.target.response;
               if (e.target.response && e.loaded>viewer.jpeg_index[(viewer.thumbs.current||0)+1]) {
                 if (!viewer.thumbs.progressEvent) {
@@ -460,6 +461,7 @@ var viewer={
           if (data.error) {
              console.log(data);
              console.log(data.error);
+             setTimeout(viewer.loadThumbnails,10);
              return;
           }
 
@@ -1471,7 +1473,13 @@ var frustums={
       frustums.window=window;
 
       frustums.load(function(ply){
-        frustums.parse_ply(window,ply);
+        try {
+          frustums.parse_ply(window,ply);
+        } catch(e) {
+          console.log(e);
+          alert('Could not parse frustums.ply');
+        }
+
         frustums.addToScene();
         frustums.setupEventHandlers();
         $(frustums).trigger('load');
@@ -1527,7 +1535,10 @@ var frustums={
         dataType: 'text',
         success: callback,
         error: function() {
+          alert('Could not load '+frustums.url);
+          window.history.back();
           console.log('Could not load '+frustums.url);
+
         }
       });
 
