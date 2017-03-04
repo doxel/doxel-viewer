@@ -34,6 +34,32 @@
       $(document).ready(function(){
 
 
+        var buttonp=$('a.pano');
+        var iconp=$('div',buttonp);
+        buttonp.on('click',function(){
+          if (iconp.hasClass('fa-square-o')) {
+            iconp.addClass('fa-circle-o').removeClass('fa-square-o');
+            buttonp.attr('title','Show Tiles');
+            viewer.mode.panorama=true;
+            if (frustums.imesh) frustums.imesh.material.opacity=0;
+            if (panorama.mesh && panorama.filename.split('/').pop()==viewer.thumbs[Math.floor(viewer.pose)].panorama.filename) {
+              panorama.mesh.fadeIn();
+            } else {
+              panorama.show(viewer.pose);
+            }
+            viewer.showPose(viewer.pose);
+          } else {
+            iconp.addClass('fa-square-o').removeClass('fa-circle-o');
+            buttonp.attr('title','Show panoramas');
+            viewer.mode.panorama=false;
+            if (panorama.mesh && panorama.mesh.material)
+            panorama.mesh.material.opacity=0;
+            if (!viewer.rel_active) frustums.showImage(viewer.pose);
+            viewer.showPose(viewer.pose);
+          }
+
+        });
+
         var button=$('a.play');
         var icon=$('div',button);
         button.on('click',function(){
@@ -118,7 +144,7 @@ a.button div {
   margin: 0.2em;
 }
 
-a.play, a.rec  {
+a.play, a.rec, a.pano  {
   top: 10px;
   width: 3em;
 }
@@ -127,16 +153,24 @@ a.play {
 }
 
 a.rec {
+  right: 8em;
+}
+
+a.pano {
   right: 4em;
 }
 
 @media screen and (min-height: 480px) and (min-width: 480px) {
-  a.play, a.rec {
+  a.pano, a.play, a.rec {
     top: 155px;
   }
+
 }     
       
 
+div.fa-cirle-o, div.fa-square-o  {
+  padding-left: 0.0em;
+}
 div.fa-video-camera  {
   padding-left: 0.0em;
 }
@@ -155,7 +189,8 @@ div.fa-play  {
   top: 1px;
   color: rgba(255,0,0,1);
 }
-.rec div.fa-video-camera  {
+.rec div.fa-video-camera,
+.pano div {
   left: -3px;
   top: 0px;
 }
@@ -198,7 +233,8 @@ iframe {
       <div id="map"></div>
     </div>
     <div id="controls">
-     <a class="button rec" draggable="false"><div class="fa fa-fw fa-video-camera" aria-hidden="true"></div></a>
+     <a class="button pano" draggable="false" title="Show panorama"><div class="fa fa-fw fa-square-o" aria-hidden="true"></div></a>
+     <a class="button rec hidden" draggable="false"><div class="fa fa-fw fa-video-camera" aria-hidden="true"></div></a>
      <a class="button play" draggable="false"><div class="fa fa-fw fa-play" aria-hidden="true"></div></a>
    </div>
 

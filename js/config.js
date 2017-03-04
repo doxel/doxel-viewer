@@ -1,2 +1,2 @@
-viewer.segmentURL='upload/2015/11/25/14484684/dda90fe50f4d06cbc627799a2ec907da/1448468454_000000/'
+viewer.segmentURL='1487759561_000000'
 

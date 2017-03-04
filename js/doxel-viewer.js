@@ -266,14 +266,36 @@ var viewer={
 
           if (view.extrinsics==undefined && viewer.posesOnly) return true;
 
-          // add thumbnail to html
-          html+='<a class="landscape" data-key="'+view.key+'"'+(view.extrinsics!==undefined?' data-pose="'+view.extrinsics+'">':'>')+'<i></i></a>';
-
-          thumbs.push({
+          var filename=view.value.ptr_wrapper.data.filename;
+          var thumb={
             view: view,
-            url: viewer.segmentURL+'/original_images/'+view.value.ptr_wrapper.data.filename,
+            url: viewer.segmentURL+'/original_images/'+filename,
             metadata_size: view.value.ptr_wrapper.data.metadata_size||viewer.metadata_size
-          });
+          };
+
+          // check if filename format match panorama tiles filename format
+          var matches=filename.match(/^[0-9]{10}_[0-9]{6}_([0-9]+)(\..*)/);
+          if (matches) {
+//           viewer.mode.panorama=true;
+            // store panorama filename and tile index
+            var tileIndex=Number(matches[1]);
+            thumb.panorama={
+              filename: filename.substr(0,17)+matches[2],
+              tileIndex: tileIndex,
+              zeropose: thumbs.length-tileIndex
+            }
+          }
+
+          thumbs.push(thumb);
+
+          html+=
+          // thumbnail wrapper anchor
+            '<a class="landscape" data-key="'+view.key+'"'+(view.extrinsics!==undefined?' data-pose="'+view.extrinsics+'">':'>')
+          // thumbnail
+          + '<i></i>' 
+          // thumbnail info
+          + '<div class="thumbinfo"><div id="thumbfilename">'+filename+'</div></div>'
+          + '</a>';
 
         });
 
@@ -437,7 +459,7 @@ var viewer={
           },
 
           error: function(){
-            console.log(arguments);
+         //   console.log(arguments);
             // thumbnail not found, delay next thumbnail
             // TODO: display "no image"
             setTimeout(viewer.loadThumbnails,0);
@@ -495,7 +517,7 @@ var viewer={
 
             }
           } catch(e) {
-            console.log(e);
+          //  console.log(e);
             //alert(e.message);
           }
 
@@ -514,7 +536,7 @@ var viewer={
             }
 
           } catch(e) {
-            console.log(e);
+         //   console.log(e);
             //alert(e.message);
           }
 
@@ -628,6 +650,8 @@ var viewer={
       var pose=this.dataset.pose;
       if (pose!==undefined) {
         frustums.hide();
+        // hide the panorama if we are going to travel to another one
+        if (panorama.mesh && panorama.filename.split('/').pop()!=viewer.thumbs[pose].panorama.filename) panorama.mesh.material.opacity=0;
         viewer.showPose({
           pose: pose,
           callback: function(){
@@ -705,7 +729,7 @@ var viewer={
       viewer.goto({
         position: cam.position,
         rotation: cam.rotation,
-        steps: options.steps||10,
+        steps: options.steps||40,
         callback: function() {
           $(viewer).trigger('showpose',[poseIndex]);
           if (options.callback) {
@@ -736,6 +760,8 @@ var viewer={
     relativeCameraCoordinates: function viewer_relativeCameraCoordinates(pose) {
 
       var result=viewer.zorel;
+      viewer.rel_active=false;
+      return result;
 
       if (viewer._lockRelativeCameraExtrinsics) {
         // dont update relative camera Rt when entering play mode from
@@ -1458,7 +1484,7 @@ var frustums={
     /**
     * @property frustums.fadeInSteps
     */
-    fadeInSteps: 1,
+    fadeInSteps: 140,
 
     /**
     * @property frustums.fadeOutSteps
@@ -1681,6 +1707,12 @@ var frustums={
     * @method frustums.showImage
     */
     showImage: function frustums_showImage(pose) {
+      pose=Math.floor(pose);
+
+      if (viewer.mode.panorama) {
+        panorama.show(pose);
+        return;
+      }
 
       // same pose, same mesh
       if (frustums.imesh && frustums.imesh.pose==pose) {
@@ -1757,110 +1789,9 @@ var frustums={
 
       viewer.window.viewer.scene.fruscene.add(frustums.imesh);
 
-      frustums.imesh.fadeIn=function fadeIn(callback) {
-        function _fadeIn() {
-          material.opacity+=1/frustums.fadeInSteps;
-          if (material.opacity>=1) {
-            material.opacity=1;
-            if (callback) {
-              callback();
-            }
-            return;
-          }
-          requestAnimationFrame(_fadeIn);
-        }
-        _fadeIn();
-
-      } // frustums.imesh.fadeIn
-
-      frustums.imesh.fadeOut=function fadeOut(callback) {
-        function _fadeOut() {
-          material.opacity-=1/frustums.fadeOutSteps;
-          if (material.opacity<=0) {
-            material.opacity=0;
-            if (callback) {
-              callback();
-            }
-            return;
-          }
-          requestAnimationFrame(_fadeOut);
-        }
-        _fadeOut();
-
-      } // frustums.imesh.fadeOut
-
       frustums.imesh.fadeIn();
 
     }, // frustums.showImage
-/*
-    showImage: function frustums_showImage(pose) {
-      var THREE=viewer.window.THREE;
-      var geometry=new THREE.Geometry();
-      var v=new THREE.Vector3();
-      var p=frustums.mesh.geometry.attributes.position.array;
-      var vertex_index=frustums.mesh.geometry.attributes.index.array;
-
-      // offset of first vertex index in attributes.index.array
-      var offset=pose*18+12;
-      var c;
-
-      for (var i=0; i<6 ; ++i) {
-        var position_index=vertex_index[offset+i]*3;
-        console.log(position_index);
-        geometry.vertices.push(v.set(p[position_index],p[position_index+1],p[position_index+2]));
-        console.log(v);
-      }
-
-      geometry.faces.push(new THREE.Face3(0,1,2));
-      geometry.faces.push(new THREE.Face3(3,4,5));
-
-      geometry.faceVertexUvs[0]=[
-        [
-          new THREE.Vector2(0,1),
-          new THREE.Vector2(0,0),
-          new THREE.Vector2(1,1)
-        ],
-
-        [
-          new THREE.Vector2(0,0),
-          new THREE.Vector2(1,0),
-          new THREE.Vector2(1,1)
-        ]
-      ];
-
-      geometry.verticesNeedUpdate=true;
-      geometry.uvsNeedUpdate=true;
-      geometry.computeBoundingSphere();
-      geometry.computeFaceNormals();
-      geometry.computeVertexNormals();
-
-      var texture=THREE.ImageUtils.loadTexture(
-        document.location.pathname.replace(/[^\/]+$/,'')+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
-        THREE.UVMapping,
-        function texture_onload() {
-          console.log('texture_onload',arguments);
-        },
-        function texture_onerror() {
-          console.log(arguments);
-          alert('Could not load undistorted pose image');
-        }
-      );
-      texture.minFilter=THREE.LinearFilter
-
-      var material=new THREE.MeshBasicMaterial({
-        map: texture,
-        side: THREE.DoubleSide
-      });
-
-      material.needsUpdate=true;
-
-      frustums.imesh=new THREE.Mesh(geometry, material);
-
-
-      viewer.window.scene.add(frustums.imesh);
-
-    } // frustums.showImage
-*/
 
 } // frustums
 
@@ -1886,6 +1817,9 @@ var iframe={
     }
 
     viewer.window=window;
+
+    myTHREE.init();
+
     $(frustums).on('load',function(){
       $(viewer.container).removeClass('disabled');
       viewer.showFirstPose();
@@ -1896,3 +1830,164 @@ var iframe={
   } // iframe.onload
 
 } // iframe
+
+/**
+* @object panorama
+*/
+var panorama={
+  fadeInSteps: 140,
+  fadeOutSteps: 10,
+  tilesPerPanorama: 10,
+
+  show: function panorama_show(pose){
+    panorama.info=viewer.thumbs[Math.floor(pose)].panorama;
+
+    var THREE=viewer.window.THREE;
+    var mesh=panorama.mesh;
+    
+
+    var pathname=document.location.pathname.replace(/[^\/]+.html$/,'');
+    var panorama_filename=pathname+viewer.segmentURL+'/original_panos/'+panorama.info.filename;
+
+    if (mesh) {
+      if (panorama.filename==panorama_filename) {
+        //mesh.material.map.image.src=panorama_filename;
+        //mesh.material.map.needsUpdate=true;
+        mesh.fadeIn();
+        return
+      } else {
+        viewer.window.viewer.scene.scene.remove(mesh);
+        mesh.geometry.dispose();
+        mesh.material.dispose();
+        mesh.material.map.dispose();
+
+      }
+    }
+    
+    {
+       panorama.filename=panorama_filename;
+       var geometry=new THREE.SphereGeometry(500,60,30);
+       var material= new THREE.MeshBasicMaterial({
+         map: new THREE.TextureLoader().load(panorama.filename),
+         depthTest: false,
+         depthWrite: false,
+         transparent: true
+
+       });
+       material.depthTest=false;
+       material.depthWrite=false;
+       material.map.blendingMode=THREE.AdditiveBlending;
+       material.transparent=true;
+       material.opacity=0.8;
+       material.map.flipY=false;
+       material.side=THREE.DoubleSide;
+
+       var mesh=panorama.mesh=new THREE.Mesh(geometry, material);
+
+       panorama.setSphereRotation();
+
+       var p=viewer.getPoseExtrinsics(pose);
+       mesh.position.set(p.position[0],p.position[1],p.position[2]);
+
+       viewer.window.viewer.scene.scene.add(mesh);
+    }
+
+  }, // panorama_show
+
+  setSphereRotation: function panorama_setSphereRotation(){
+    var THREE=viewer.window.THREE;
+    if (true || panorama.info.zeropose<panorama.tilesPerPanorama) {
+      panorama.mesh.rotation.y=-Math.PI/2;
+      return;
+    }
+
+    var R0=viewer.getPoseExtrinsics(0).rotation;
+    var R1=viewer.getPoseExtrinsics(panorama.info.zeropose).rotation;
+  
+    var R=new THREE.Matrix4().set(
+     R1[0][0]-R0[0][0], R1[0][1]-R0[0][1], R1[0][2]-R0[0][2], 0,
+     R1[1][0]-R0[1][0], R1[0][1]-R0[1][1], R1[0][2]-R0[1][2], 0,
+     R1[2][0]-R0[2][0], R1[0][1]-R0[2][1], R1[0][2]-R0[2][2], 0,
+     0, 0, 0, 1
+    );
+      
+    var R2=new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(0,1,0),-Math.PI/2)
+    var rotation=new THREE.Matrix4().multiplyMatrices(R2,R);
+    panorama.mesh.quaternion.setFromRotationMatrix(rotation);
+
+
+  } // panorama_setSphereRotation
+
+} // panorama
+
+// THREE add-ons
+var myTHREE={
+  Mesh: {
+    fadeIn: function fadeIn(options) {
+      options=options||{};
+      var material=this.material;
+      var prev=material.opacity;
+      var targetOpacity=options.targetOpacity||0.6;
+      var fadeInSteps=options.fadeInSteps||10;
+      function _fadeIn() {
+        if (material.opacity<prev) {
+          return;
+        }  
+        material.opacity+=targetOpacity/fadeInSteps;
+        if (material.opacity>=targetOpacity) {
+          material.opacity=targetOpacity;
+          if (options.callback) {
+            options.callback();
+          }
+          return;
+        }  
+        prev=material.opacity;
+        requestAnimationFrame(_fadeIn);
+      }    
+      _fadeIn();
+           
+    }, // myTHREE.mesh.fadeIn
+
+    fadeOut: function fadeOut(options) {
+      options=options||{};
+      var material=this.material;
+      var prev=material.opacity;
+      var initialOpacity=material.opacity
+      var targetOpacity=options.targetOpacity||0;
+      var fadeOutSteps=options.fadeOutSteps||10;
+      function _fadeOut() {
+        if (material.opacity>prev) {
+          return;
+        }  
+        material.opacity-=initialOpacity/fadeOutSteps;
+        if (material.opacity<=targetOpacity) {
+          material.opacity=targetOpacity;
+          if (options.callback) {
+            options.callback();
+          }
+          return;
+        }  
+        prev=material.opacity;
+        requestAnimationFrame(_fadeOut);
+      }    
+      _fadeOut();
+           
+    } // myTHREE.mesh.fadeOut
+
+  }, // mesh
+
+  init: function myTHREE_init(){
+    var THREE=viewer.window.THREE;
+    for (constructorName in myTHREE) {
+      if (myTHREE.hasOwnProperty(constructorName) && constructorName.match(/^[A-Z]/)) {
+        var methods=myTHREE[constructorName];
+        for (methodName in methods) {
+          if (methods.hasOwnProperty(methodName)) {
+            THREE[constructorName].prototype[methodName]=methods[methodName];
+          }
+        }
+      }
+    }
+  }
+
+} // myTHREE
