@@ -14199,6 +14199,7 @@ Potree.Viewer = class PotreeViewer extends THREE.EventDispatcher{
 			
 			//camera.lookAt(scene.view.getPivot());
       if (this.scene.view.mode.doxel) {
+        this.radius=2;
         camera.up.copy(this.scene.view.up);
         camera.lookAt(this.scene.view.lookAt);
         camera.updateMatrixWorld();

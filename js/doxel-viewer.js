@@ -1326,7 +1326,9 @@ var viewer={
         var rel=viewer.relativeCameraCoordinates();
 
 	      if (frustums.imesh) {
-          frustums.imesh.fadeOut();
+          frustums.imesh.fadeOut({
+            steps: 1
+          });
         }
 
         viewer.mode.scrolling=true;
@@ -1458,7 +1460,7 @@ var frustums={
     /**
     * @property frustums.fadeInSteps
     */
-    fadeInSteps: 1,
+    fadeInSteps: 140,
 
     /**
     * @property frustums.fadeOutSteps
@@ -1666,7 +1668,9 @@ var frustums={
       }
       frustums.mesh.visible=frustums.mode.always;
       if (!frustums.mesh.visible && frustums.imesh) {
-        frustums.imesh.fadeOut();
+        frustums.imesh.fadeOut({
+          steps:1
+        });
       }
     }, // frustums.hide
 
@@ -1732,7 +1736,9 @@ var frustums={
         ((viewer.segmentURL.split('/')[1]=='api')?'':document.location.pathname.replace(/[^\/]+$/,''))+viewer.segmentURL+'/PMVS/visualize/'+(('00000000'+pose).substr(-8))+'.jpg',
 
         THREE.UVMapping,
-        undefined,
+        function texture_onload() {
+          frustums.imesh.fadeIn()
+        },
         function texture_onerror() {
           console.log(arguments);
           alert('Could not load undistorted pose image');
@@ -1756,38 +1762,6 @@ var frustums={
       frustums.imesh.pose=pose;
 
       viewer.window.viewer.scene.fruscene.add(frustums.imesh);
-
-      frustums.imesh.fadeIn=function fadeIn(callback) {
-        function _fadeIn() {
-          material.opacity+=1/frustums.fadeInSteps;
-          if (material.opacity>=1) {
-            material.opacity=1;
-            if (callback) {
-              callback();
-            }
-            return;
-          }
-          requestAnimationFrame(_fadeIn);
-        }
-        _fadeIn();
-
-      } // frustums.imesh.fadeIn
-
-      frustums.imesh.fadeOut=function fadeOut(callback) {
-        function _fadeOut() {
-          material.opacity-=1/frustums.fadeOutSteps;
-          if (material.opacity<=0) {
-            material.opacity=0;
-            if (callback) {
-              callback();
-            }
-            return;
-          }
-          requestAnimationFrame(_fadeOut);
-        }
-        _fadeOut();
-
-      } // frustums.imesh.fadeOut
 
       frustums.imesh.fadeIn();
 
@@ -1886,6 +1860,9 @@ var iframe={
     }
 
     viewer.window=window;
+
+    myTHREE.init();
+
     $(frustums).on('load',function(){
       $(viewer.container).removeClass('disabled');
       viewer.showFirstPose();
@@ -1896,3 +1873,75 @@ var iframe={
   } // iframe.onload
 
 } // iframe
+
+// THREE add-ons
+var myTHREE={
+  Mesh: {
+    fadeIn: function fadeIn(options) {
+      options=options||{};
+      var material=this.material;
+      var prev=material.opacity;
+      var targetOpacity=options.opacity||0.6;
+      var fadeInSteps=options.steps||10;
+      function _fadeIn() {
+        if (material.opacity<prev) {
+          return;
+        }
+        material.opacity+=targetOpacity/fadeInSteps;
+        if (material.opacity>=targetOpacity) {
+          material.opacity=targetOpacity;
+          if (options.callback) {
+            options.callback();
+          }
+          return;
+        }
+        prev=material.opacity;
+        requestAnimationFrame(_fadeIn);
+      }
+      _fadeIn();
+
+    }, // myTHREE.mesh.fadeIn
+
+    fadeOut: function fadeOut(options) {
+      options=options||{};
+      var material=this.material;
+      var prev=material.opacity;
+      var initialOpacity=material.opacity
+      var targetOpacity=options.opacity||0;
+      var fadeOutSteps=isNaN(options.steps)?10:options.steps;
+      function _fadeOut() {
+        if (material.opacity>prev) {
+          return;
+        }
+        material.opacity-=initialOpacity/fadeOutSteps;
+        if (material.opacity<=targetOpacity) {
+          material.opacity=targetOpacity;
+          if (options.callback) {
+            options.callback();
+          }
+          return;
+        }
+        prev=material.opacity;
+        requestAnimationFrame(_fadeOut);
+      }
+      _fadeOut();
+
+    } // myTHREE.mesh.fadeOut
+
+  }, // mesh
+
+  init: function myTHREE_init(){
+    var THREE=viewer.window.THREE;
+    for (constructorName in myTHREE) {
+      if (myTHREE.hasOwnProperty(constructorName) && constructorName.match(/^[A-Z]/)) {
+        var methods=myTHREE[constructorName];
+        for (methodName in methods) {
+          if (methods.hasOwnProperty(methodName)) {
+            THREE[constructorName].prototype[methodName]=methods[methodName];
+          }
+        }
+      }
+    }
+  }
+
+} // myTHREE
