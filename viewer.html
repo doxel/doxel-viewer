@@ -64,6 +64,10 @@
         }());
 
         var recbutton=$('a.rec');
+        if (localStorage && localStorage.rec) {
+          recbutton.removeClass('hidden');
+        }
+
         var recicon=$('div',recbutton);
         recbutton.on('click',function(){
           if (recicon.hasClass('fa-video-camera')) {
@@ -197,7 +201,7 @@ iframe {
       <div id="map"></div>
     </div>
     <div id="controls">
-     <!--a class="button rec" draggable="false"><div class="fa fa-fw fa-video-camera" aria-hidden="true"></div></a-->
+     <a class="button rec hidden" draggable="false"><div class="fa fa-fw fa-video-camera" aria-hidden="true"></div></a>
      <a class="button play" draggable="false"><div class="fa fa-fw fa-play" aria-hidden="true"></div></a>
    </div>
 
