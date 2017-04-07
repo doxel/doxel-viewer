@@ -53,6 +53,10 @@ function getParam(name) {
 
     // read src query parameter
     var src=getParam('src');
+    var firstPose=getParam('pose');
+    if (firstPose!==undefined) {
+      viewer.firstPose=firstPose;
+    }
 
     // use either the specified src, or document.referrer or predefined segmentURL (in js/config.js)
     src=src||document.referrer||viewer.segmentURL;
@@ -91,10 +95,15 @@ function getParam(name) {
       }
 
       // change url in address bar and push history state
-      if (window.location.search!='?src='+viewer.segmentURL) {
+      var search='?src='+viewer.segmentURL;
+      if (viewer.firstPose!==undefined) {
+        search+='&pose='+viewer.firstPose;
+      }
+      if (window.location.search!=search) {
         History.pushState({
-          src: viewer.segmentURL
-        },null,'?src='+viewer.segmentURL);
+          src: viewer.segmentURL,
+          pose: viewer.firstPose
+        },null,search);
       }
     }
 
@@ -1218,10 +1227,14 @@ var viewer={
     showFirstPose: function viewer_showFirstPose() {
       var a=$('#thumbnails a[data-pose]:first');
       if (a.length) {
+        var pose=viewer.firstPose;
+        if (pose===undefined) {
+          pose=a.data('pose');
+        }
         viewer.mode.showFirstPose=true;
         viewer.mode.firstPoseShown=false;
         viewer.showPose({
-          pose: a.data('pose'),
+          pose: pose,
           steps: 1,
           callback: function() {
             viewer.mode.showFirstPose=false;
@@ -1521,7 +1534,9 @@ var frustums={
 
       // show frustum image on viewer 'firstpose' event
       $(viewer).on('firstpose',function(e){
-        frustums.showImage(viewer.pose);
+        if (viewer.pose-Math.floor(viewer.pose)<0.00001) {
+          frustums.showImage(Math.floor(viewer.pose));
+        }
       });
 
     }, // frustums.setupEventHandlers
