@@ -1,6 +1,6 @@
 [submodule "js/thirdparty/blueimp-load-image"]
 	path = js/thirdparty/blueimp-load-image
-	url = https://github.com/blueimp/JavaScript-Load-Image
+	url = https://github.com/doxel/JavaScript-Load-Image
 [submodule "js/thirdparty/history.js"]
 	path = js/thirdparty/history.js
 	url = https://github.com/browserstate/history.js
