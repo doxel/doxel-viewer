@@ -26,4 +26,4 @@ get_plys() {
 }
 
 # must use the full path to run CC !
-env DISPLAY=:0 $CLOUDCOMPARE -SILENT -C_EXPORT_FMT PLY -PLY_EXPORT_FMT ASCII $(get_plys) -MERGE_CLOUDS || exit 1
+xvfb-run $CLOUDCOMPARE -SILENT -C_EXPORT_FMT PLY -PLY_EXPORT_FMT ASCII $(get_plys) -MERGE_CLOUDS || exit 1

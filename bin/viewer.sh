@@ -38,9 +38,7 @@ openMVG_main_ConvertSfM_DataFormat  -I -V -E  -i openMVG/robust.json -o ./viewer
 
 # generate jpeg_metadata_index.bin and jpeg_metadata.bin
 pushd .
-cd original_images
-jpeg_metadata $(poses $PWD/../viewer/viewer.json)
-mv jpeg_*.bin ../viewer
+doxel-viewer-thumbs
 popd
 
 # set initial pose

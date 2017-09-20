@@ -26,5 +26,7 @@
     "opn": "^4.0.2",
     "wiredep": "^4.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cors": "^2.8.1"
+  }
 }
