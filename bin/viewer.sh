@@ -25,7 +25,7 @@ else
   PLY=$(pwd)/PMVS/models/option-????_MERGED*.ply
 fi
 else
-  PLY=$(pwd)/PMVS/models/options-????.ply
+  PLY=$(pwd)/PMVS/models/option-????.ply
 fi
 
 # convert pointcloud
