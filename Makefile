@@ -1,2 +1,4 @@
+PREFIX?=/usr/local
+
 install:
-	install -D bin/* ~/bin/.
+	install -D bin/* ${PREFIX}/bin/.
