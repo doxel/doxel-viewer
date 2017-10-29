@@ -33,8 +33,13 @@ EOF
 
 }
 
+AVGCOORDS=$(getavgcoords)
+grep -q NaN <<< $AVGCOORDS || {
+
 sleep 2
-wget "http://nominatim.openstreetmap.org/reverse?format=json&$(getavgcoords)&zoom=18&addressdetails=1" -O nominatim.json
+wget "http://nominatim.openstreetmap.org/reverse?format=json&$AVGCOORDS&zoom=18&addressdetails=1" -O nominatim.json
+
+}
 
 #node << EOF
 #var json=require("$TEMP.json");
