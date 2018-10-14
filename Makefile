@@ -1,2 +1,7 @@
+PREFIX?=/usr/local
+all:
+
 install:
-	install -D bin/* ~/bin/.
+	install -D bin/* ${PREFIX}/bin/.
+
+.PHONY: all install
