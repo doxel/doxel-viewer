@@ -74,6 +74,7 @@
 	<script src="../libs/plasio/vendor/bluebird.js"></script>
 	<script src="../build/potree/laslaz.js"></script>
   <script src="../../../bower_components/recordrtc/RecordRTC.js"></script>
+  <script src="../../../bower_components/recordrtc/lib/screenshot.js"></script>
 	
 
     <div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
@@ -134,7 +135,8 @@
           var canvas=$('canvas').get(0);
           viewer.recorder=RecordRTC(canvas,{
             type: 'canvas',
-            showMousePointer: false
+            showMousePointer: false,
+            useWhammyRecorder: true
           });
           viewer.recorder.startRecording();
         }
