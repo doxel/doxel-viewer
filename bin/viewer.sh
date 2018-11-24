@@ -7,26 +7,7 @@ WEBROOT=doxel-viewer
 set -e
 set -v
 
-if false ; then
-# only one file ?
-if ! stat PMVS/models/option-0001.ply >/dev/null 2>&1 ; then
-  if [ $(find PMVS/models -name '*.ply' | wc -l) -ne 1 ] ; then
-    echo "error: more than one ply in $PWD/PMVS/models/" >&2
-    echo "PLY not following option-nnnn.ply naming convention ?" >&2
-    exit 1
-  fi
-
-  PLY=$(pwd)PMVS/models/option-0000.ply
-
-else
-  # merge PMVS/models/*ply into /PMVS/models/option-0000_MERGED*.ply
-  plymergeall
-
-  PLY=$(pwd)/PMVS/models/option-????_MERGED*.ply
-fi
-else
-  PLY=$(pwd)/PMVS/models/option-????.ply
-fi
+[ -z "$PLY" ] && PLY=$(pwd)/PMVS/models/option-????.ply
 
 # convert pointcloud
 PotreeConverter -p potree -o $(pwd)/potree $PLY --overwrite
