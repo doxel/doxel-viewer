@@ -21,6 +21,15 @@ mkdir -p viewer
 # export views and poses
 openMVG_main_ConvertSfM_DataFormat -I -V -E  -i $(pwd)/openMVG/robust.json -o $(pwd)/viewer/viewer.json
 
+WD=$(pwd)
+LEN=${#WD}
+RELPLY=$(sed -r -e 's/^\///' <<< ${PLY:$LEN})
+cat > viewer/doxel.json << EOF
+{
+  "ply" : "$RELPLY"
+}
+EOF
+
 # generate jpeg_metadata_index.bin and jpeg_metadata.bin
 pushd .
 doxel-viewer-thumbs
@@ -46,3 +55,4 @@ EOF
 
 # generate nominatim.json
 [ -f nominatim.json ] || poses $PWD/viewer/viewer.json | georef original_images
+
