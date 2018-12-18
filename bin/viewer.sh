@@ -24,6 +24,9 @@ openMVG_main_ConvertSfM_DataFormat -I -V -E  -i $(pwd)/openMVG/robust.json -o $(
 WD=$(pwd)
 LEN=${#WD}
 RELPLY=$(sed -r -e 's/^\///' <<< ${PLY:$LEN})
+
+[[ "$(basename $RELPLY)" =~ "?" ]] && RELPLY=$(dirname $RELPLY) 
+
 cat > viewer/doxel.json << EOF
 {
   "ply" : "$RELPLY"
