@@ -69,6 +69,9 @@ function getParam(name) {
       var segmentId=pathname[4];
       var timestamp=pathname[5];
       viewer.segmentURL='/api/segments/viewer/'+segmentId+'/'+timestamp;
+      if (pathname[6].match(/[0-9]+/)) {
+        viewer.segmentURL+='/'+pathname[6];
+      }
 
     } else {
       // replace in two steps for backward directory naming compatibility
@@ -1423,7 +1426,20 @@ var viewer={
         ]
       };
 
-    } // viewer.applyRelativeCameraSettings
+    }, // viewer.applyRelativeCameraSettings
+
+    addPointCloud: function(url){
+      $('iframe')[0].contentWindow.viewer.addPointCloud(url);
+      setTimeout(function(){
+        viewer.showPose(viewer.pose);
+      },150);
+    },
+
+    addPointCloudByIndex: function(index){
+      var url=viewer.segmentURL.replace(/\/[0-9+]$/,'')+((index<0)?'':'/'+index)+'/potree/resources/pointclouds/potree/cloud.js';
+      viewer.addPointCloud(url);
+    }
+
 
 } // viewer
 
