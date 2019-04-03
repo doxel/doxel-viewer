@@ -1,7 +1,7 @@
 /*
  * doxel-viewer.js
  *
- * Copyright (c) 2015-2018 ALSENET SA - http://doxel.org
+ * Copyright (c) 2015-2019 ALSENET SA - http://doxel.org
  * Please read <http://doxel.org/license> for more information.
  *
  * Author(s):
