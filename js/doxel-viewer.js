@@ -64,13 +64,22 @@ function getParam(name) {
     }
 
     var pathname=document.location.pathname.split('/');
-    if (pathname[1]=='api' && pathname[2]=='segments' && pathname[3]=='viewer') {
+    if (pathname[1]=='api' && pathname[2]=='segments' && (pathname[3]=='viewer' || pathname[4]=='viewer')) {
       // when viewer is instantiated through doxel-strongloop api, exract segmentUrl from pathname
-      var segmentId=pathname[4];
-      var timestamp=pathname[5];
-      viewer.segmentURL='/api/segments/viewer/'+segmentId+'/'+timestamp;
-      if (pathname[6].match(/[0-9]+/)) {
-        viewer.segmentURL+='/'+pathname[6];
+      if (pathname[4]=='viewer') {
+        var segmentId=pathname[3];
+        viewer.segmentURL='/api/segments/'+segmentId+'/viewer';
+        if (pathname[5].match(/[0-9]+/)) {
+          viewer.segmentURL+='/'+pathname[5];
+        }
+
+      } else {
+        var segmentId=pathname[4];
+        var timestamp=pathname[5];
+        viewer.segmentURL='/api/segments/viewer/'+segmentId+'/'+timestamp;
+        if (pathname[6].match(/[0-9]+/)) {
+          viewer.segmentURL+='/'+pathname[6];
+        }
       }
 
     } else {
